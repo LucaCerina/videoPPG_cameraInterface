@@ -36,6 +36,14 @@ bool cameraReader::initCamera(int device)
     if(captureDevice.isOpened())
     {
         frameRate = (int) captureDevice.get(CV_CAP_PROP_FPS);
+        //BRUTTO DA SISTEMARE
+        if(frameRate == 0)
+        {
+            DShowLib::Grabber* m_pGrabber = new DShowLib::Grabber();
+            m_pGrabber->openDevByDisplayName("DFK 23UM021");
+            frameRate = m_pGrabber->getFPS();
+            qDebug() << frameRate;
+        }
         return true;
     }
     else
@@ -63,6 +71,7 @@ void cameraReader::Play()
     {
         if(isStopped())
             stop = false;
+        qDebug() << "stop is " << stop;
         start(LowPriority);
     }
 }
@@ -75,8 +84,10 @@ void cameraReader::Stop()
 void cameraReader::run()
 {
     int delay = 1000/frameRate;
+    qDebug() << "delay set";
     while(!stop)
     {
+        qDebug() << "try to read a frame";
         if(!captureDevice.read(frame))
             stop = true;
         faceDetect(frame);

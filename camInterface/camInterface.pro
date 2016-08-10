@@ -14,7 +14,9 @@ TEMPLATE = app
 #INCLUDEPATH += /usr/local/include/opencv2
 #LIBS += -L /usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_videoio -lopencv_imgproc -lopencv_objdetect -lopencv_highgui
 INCLUDEPATH += C:\Users\Bio-tec\Documents\opencv\build\include
+INCLUDEPATH += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\include"
 LIBS += C:\Users\Bio-tec\Documents\opencv\build\x64\vc14\lib\opencv_world310d.lib
+LIBS += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\x64\debug\TIS_UDSHL11d_x64.lib"
 
 SOURCES += main.cpp\
         mainwindow.cpp \

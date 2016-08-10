@@ -8,6 +8,8 @@
 #include <QDir>
 #include <QDebug>
 #include <QFile>
+#include<Grabber.h>
+#include<tisudshl.h>
 
 
 namespace Ui {
@@ -34,6 +36,8 @@ private slots:
 private:
     Ui::camerasetupdialog *ui;
     QString settingsFile;
+    void populateFPSList();
+    void camerasetupdialog::populateFormatList();
 };
 
 #endif // CAMERASETUPDIALOG_H
