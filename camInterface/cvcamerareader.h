@@ -6,11 +6,15 @@
 #include<QWaitCondition>
 #include<QMessageBox>
 #include<QDebug>
+#include <QSettings>
+#include<QFile>
+#include<QApplication>
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv2/imgproc/imgproc.hpp>
 #include<opencv2/objdetect/objdetect.hpp>
 #include<tisudshl.h>
+#include<Grabber.h>
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -25,21 +29,30 @@ class cameraReader: public QThread
 private:
     bool stop;
     bool cameraInit;
+    bool recording;
     QMutex mutex;
     QWaitCondition condition;
     Mat frame;
-    int frameRate;
+    double frameRate;
     VideoCapture captureDevice;
+    VideoWriter outputDevice;
     Mat RGBFrame;
     QImage img;
     CascadeClassifier faceCatch;
     //methods
     bool initClassifier();
     void faceDetect(Mat &input);
+    DShowLib::Grabber *m_pGrabber;
+    DShowLib::FrameHandlerSink::tFHSPtr m_pSink;
+    int nFrames,frameCounter;
 
 signals:
     void processedImage(const QImage &image);
     void detectedFace(bool value);
+    void recordCompleted();
+public slots:
+    void onRecordStarted(bool value);
+
 protected:
     void run();
     void msleep(int ms);
@@ -49,7 +62,7 @@ public:
     //Destructor
     ~cameraReader();
     //Load camera
-    bool initCamera(int device);
+    bool initCamera(int device,QString outName);
     bool checkCamera(int device);
     //methods
     void Play();

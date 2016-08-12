@@ -1,5 +1,7 @@
 #include<cvcamerareader.h>
 
+using namespace DShowLib;
+
 cameraReader::cameraReader(QObject *parent)
     :QThread(parent)
 {
@@ -29,25 +31,41 @@ bool cameraReader::initClassifier()
     return true;
 }
 
-bool cameraReader::initCamera(int device)
+bool cameraReader::initCamera(int device,QString outName)
 {
+    recording = false;
+    frameRate = 0;
     //load camera
-    captureDevice.open(device);
-    if(captureDevice.isOpened())
+    QString settingsFile = QApplication::applicationDirPath()+"/cameraSettings.ini";
+    QSettings cameraSetting(settingsFile,QSettings::IniFormat);
+    if(QFile(settingsFile).exists())
     {
-        frameRate = (int) captureDevice.get(CV_CAP_PROP_FPS);
-        //BRUTTO DA SISTEMARE
-        if(frameRate == 0)
-        {
-            DShowLib::Grabber* m_pGrabber = new DShowLib::Grabber();
-            m_pGrabber->openDevByDisplayName("DFK 23UM021");
-            frameRate = m_pGrabber->getFPS();
-            qDebug() << frameRate;
-        }
+        //captureDevice.open(device);
+        m_pGrabber = new Grabber();
+        m_pGrabber->openDevByDisplayName(cameraSetting.value("camIndex").toString().toStdWString());
+        m_pGrabber->setVideoFormat(cameraSetting.value("camFormat").toString().toStdWString());
+        m_pGrabber->closeDev();
+        captureDevice.open(device);
+        frameRate = cameraSetting.value("camFPS").toDouble();
+        if(captureDevice.set(CV_CAP_PROP_FPS,frameRate))
+            qDebug() << "setup ok " << captureDevice.get(CV_CAP_PROP_FPS);
+        //m_pGrabber->setFPS(cameraSetting.value("camFPS").toDouble());
+        //frameRate = m_pGrabber->getFPS();
+        //load video
+        qDebug() << "file " << outName;
+        if(!outputDevice.open(outName.toStdString(), CV_FOURCC('H','F','Y','U'), frameRate, Size(640, 480)))
+            qDebug() << "failed to open video";
+        //set number of frames
+        nFrames = cameraSetting.value("videoDuration").toInt()*(int)frameRate;
         return true;
     }
     else
+    {
+        QMessageBox msgBox;
+        msgBox.setText("You have to setup camera for the first time");
+        msgBox.exec();
         return false;
+    }
 }
 
 bool cameraReader::checkCamera(int device)
@@ -58,11 +76,11 @@ bool cameraReader::checkCamera(int device)
     if(captureDevice.isOpened())
     {
         cameraInit = true;
+        captureDevice.release();
         return true;
     }
     else
         return false;
-    captureDevice.release();
 }
 
 void cameraReader::Play()
@@ -71,7 +89,6 @@ void cameraReader::Play()
     {
         if(isStopped())
             stop = false;
-        qDebug() << "stop is " << stop;
         start(LowPriority);
     }
 }
@@ -83,14 +100,14 @@ void cameraReader::Stop()
 
 void cameraReader::run()
 {
-    int delay = 1000/frameRate;
-    qDebug() << "delay set";
-    while(!stop)
+    //int delay = 1000/frameRate;
+    //qDebug() << "delay set";
+    frameCounter = 0;
+    qDebug() << "open " << captureDevice.isOpened();
+    while(!stop && frameCounter<nFrames)
     {
-        qDebug() << "try to read a frame";
         if(!captureDevice.read(frame))
             stop = true;
-        faceDetect(frame);
         if(frame.channels()==3)
         {
             cv::cvtColor(frame,RGBFrame,COLOR_BGR2RGB);
@@ -103,9 +120,22 @@ void cameraReader::run()
             img = QImage((const unsigned char*)(frame.data),
                          frame.cols,frame.rows,QImage::Format_Indexed8);
         }
+        if(recording)
+        {
+            outputDevice << frame;
+            ++frameCounter;
+        }
+        else
+        {
+            faceDetect(frame);
+        }
         emit processedImage(img);
-        this->msleep(delay);
+        //this->msleep(delay);
     }
+    emit(recordCompleted());
+    stop = true;
+    outputDevice.release();
+    recording = false;
 }
 
 void cameraReader::faceDetect(Mat &input)
@@ -133,4 +163,9 @@ bool cameraReader::isStopped() const
 bool cameraReader::isInitialized() const
 {
     return this->cameraInit;
+}
+
+void cameraReader::onRecordStarted(bool value)
+{
+    recording = value;
 }

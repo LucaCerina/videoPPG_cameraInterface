@@ -11,6 +11,12 @@
 #include<Grabber.h>
 #include<tisudshl.h>
 
+typedef struct{
+    QString cameraName;
+    QString cameraFormat;
+    double cameraFps;
+    int videoDuration;
+}cameraData;
 
 namespace Ui {
 class camerasetupdialog;
@@ -27,17 +33,20 @@ public:
 private slots:
     void on_searchButton_clicked();
 
-    void on_fpsSlider_valueChanged(int value);
-
     void on_buttonBox_accepted();
 
     void on_cameraList_currentIndexChanged(int index);
 
+    void on_formatList_currentIndexChanged(int index);
+
+    void on_fpsList_currentIndexChanged(int index);
+
+    void on_lineEdit_editingFinished();
+
 private:
     Ui::camerasetupdialog *ui;
     QString settingsFile;
-    void populateFPSList();
-    void camerasetupdialog::populateFormatList();
+    cameraData camData;
 };
 
 #endif // CAMERASETUPDIALOG_H

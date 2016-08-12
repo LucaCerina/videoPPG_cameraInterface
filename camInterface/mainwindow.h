@@ -40,9 +40,18 @@ private slots:
 
     void getExternalPtData(PatientDialog::PatientData extPtIstance);
 
+    void on_recButton_clicked();
+
+public slots:
+    void onRecordCompleted();
+
+signals:
+    void recordStarted(bool value);
+
 private:
     Ui::MainWindow *ui;
     cameraReader *Reader;
+    qint64 tStart,tEnd; //framerate temporary data
 
     //Window connections
     PatientDialog *ptDialog;

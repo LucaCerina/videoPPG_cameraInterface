@@ -10,6 +10,10 @@ MainWindow::MainWindow(QWidget *parent) :
                      this,SLOT(updateVideoUI(QImage)));
     QObject::connect(Reader,SIGNAL(detectedFace(bool)),
                      this,SLOT(updateDetectedFace(bool)));
+    QObject::connect(this,SIGNAL(recordStarted(bool)),
+                     Reader,SLOT(onRecordStarted(bool)));
+    QObject::connect(Reader,SIGNAL(recordCompleted()),
+                     this,SLOT(onRecordCompleted()));
     ui->setupUi(this);
 }
 
@@ -24,17 +28,21 @@ void MainWindow::on_playButton_clicked()
     {
         Reader->Play();
         ui->playButton->setText(tr("Stop"));
+        ui->recButton->setEnabled(true);
     }
     else
     {
         Reader->Stop();
+        tEnd = QDateTime::currentMSecsSinceEpoch();
         ui->playButton->setText(tr("Play"));
+        ui->recButton->setEnabled(false);
     }
 
 }
 
 void MainWindow::on_initButton_clicked()
 {
+    QMessageBox msgBox;
     bool cameraAvailable = false;
     if(!Reader->isInitialized())
     {
@@ -48,7 +56,6 @@ void MainWindow::on_initButton_clicked()
         }
         if(!cameraAvailable)
         {
-            QMessageBox msgBox;
             msgBox.setText("Cannot open any camera! Check connections.");
             msgBox.exec();
         }
@@ -59,11 +66,24 @@ void MainWindow::on_initButton_clicked()
     }
     else
     {
-        if(!Reader->initCamera(ui->cameraList->currentText().toInt()))
+        //create folder for video file
+        QString outPath = QDir::currentPath()+"/users/"+PtIstance.ptId+"/videos/";
+        if(!QDir(outPath).exists())
+            QDir().mkdir(outPath);
+        QString outName = outPath+"video_"+PtIstance.ptId+"_"+
+                QDate::currentDate().toString("dd-MM-yyyy")+"_"
+                +QString::number(QTime::currentTime().hour())+"_"+QString::number(QTime::currentTime().minute())+".avi";
+        if(QFile(outName).exists())
         {
-            QMessageBox msgBox;
+            msgBox.setText("Attention! File already present,it will be overwritten");
+            msgBox.exec();
+        }
+        //initialize camera
+        if(!Reader->initCamera(ui->cameraList->currentText().toInt(),outName))
+        {
             msgBox.setText("Cannot open camera! Check connection.");
             msgBox.exec();
+            ui->initButton->setText("Search cameras");
         }
         else
         {
@@ -133,26 +153,8 @@ void MainWindow::on_newRecButton_clicked()
         //enable camera init
         ui->initButton->setEnabled(true);
         //search if camera was already set in settings
-        QString settingsFile = QApplication::applicationDirPath()+"/cameraSettings.conf";
-        QSettings cameraSetting(settingsFile,QSettings::NativeFormat);
-        //check if camera index exists
-        if(cameraSetting.contains("camIndex"))
-        {
-            int camIndex = cameraSetting.value("camIndex").toInt();
-            if(camIndex != -1)
-            {
-                ui->cameraList->addItem(QString::number(camIndex));
-                if(Reader->checkCamera(camIndex))
-                {
-                    qDebug() << "ready to record";
-                    ui->playButton->setEnabled(true);
-                }
-                else
-                    qDebug() << "camera not available";
-            }
-        }
-        else
-            qDebug() << "No camera index present in settings";
+        QString settingsFile = QApplication::applicationDirPath()+"/cameraSettings.ini";
+        QSettings cameraSetting(settingsFile,QSettings::IniFormat);
     }
 }
 
@@ -163,4 +165,20 @@ void MainWindow::getExternalPtData(PatientDialog::PatientData extPtIstance)
     ui->nameValue->setText(PtIstance.ptName);
     ui->surnameValue->setText(PtIstance.ptSurName);
     ui->AFValue->setText(PtIstance.ptAFType);
+}
+
+void MainWindow::on_recButton_clicked()
+{
+    tStart = QDateTime::currentMSecsSinceEpoch();
+    emit(recordStarted(true));
+}
+
+void MainWindow::onRecordCompleted()
+{
+    tEnd = QDateTime::currentMSecsSinceEpoch();
+    qDebug() << "Time passed " << (tEnd-tStart)/1000 << "s";
+    qDebug() << "Measured framerate " << 1150 / ((tEnd-tStart)/1000) << "fps";
+    ui->playButton->setText(tr("Play"));
+    ui->playButton->setEnabled(false);
+    ui->recButton->setEnabled(false);
 }
