@@ -24,20 +24,29 @@ bool cameraReader::initClassifier()
 {
     if(!faceCatch.load("C:\\Users\\Bio-tec\\Documents\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml"))
     {
-       QMessageBox msgBox;
-       msgBox.setText("Cannot load face detector.");
-       msgBox.exec();
+        QMessageBox msgBox;
+        msgBox.setText("Cannot load face detector.");
+        msgBox.exec();
     }
     return true;
 }
 
 bool cameraReader::initCamera(int device,QString outName)
 {
+    outVideoName = outName; //BRUTTO DA SISTEMARE
     recording = false;
     frameRate = 0;
     //load camera
-    QString settingsFile = QApplication::applicationDirPath()+"/cameraSettings.ini";
+    settingsFile = QApplication::applicationDirPath()+"/cameraSettings.ini";
     QSettings cameraSetting(settingsFile,QSettings::IniFormat);
+    //save video data
+    metaDataVideo = outName.section(".",0,0)+".dat";
+    QSettings metaData(metaDataVideo,QSettings::IniFormat);
+    metaData.setValue("processed","no");
+    qDebug() << outName;
+    metaData.setValue("Record date",outName.section("video_",-1).section("_",1,1));
+    metaData.setValue("Record time",outName.section("video_",-1).section("_",2,2).section(".",0,0));
+
     if(QFile(settingsFile).exists())
     {
         //captureDevice.open(device);
@@ -53,7 +62,7 @@ bool cameraReader::initCamera(int device,QString outName)
         //frameRate = m_pGrabber->getFPS();
         //load video
         qDebug() << "file " << outName;
-        if(!outputDevice.open(outName.toStdString(), CV_FOURCC('H','F','Y','U'), frameRate, Size(640, 480)))
+        if(!outputDevice.open(outName.toStdString(), CV_FOURCC('H','F','Y','U'), frameRate, Size(640, 480))) //DA SISTEMARE SIZE
             qDebug() << "failed to open video";
         //set number of frames
         nFrames = cameraSetting.value("videoDuration").toInt()*(int)frameRate;
@@ -132,10 +141,16 @@ void cameraReader::run()
         emit processedImage(img);
         //this->msleep(delay);
     }
-    emit(recordCompleted());
     stop = true;
     outputDevice.release();
     recording = false;
+    if(frameCounter > 0)
+        emit(recordCompleted());
+    else
+    {
+        QFile::remove(metaDataVideo);
+        QFile::remove(outVideoName);
+    }
 }
 
 void cameraReader::faceDetect(Mat &input)

@@ -45,6 +45,9 @@ private:
     DShowLib::Grabber *m_pGrabber;
     DShowLib::FrameHandlerSink::tFHSPtr m_pSink;
     int nFrames,frameCounter;
+    QString settingsFile;
+    QString metaDataVideo;
+    QString outVideoName;
 
 signals:
     void processedImage(const QImage &image);
@@ -69,8 +72,6 @@ public:
     void Stop();
     bool isStopped() const;
     bool isInitialized() const;
-
-
 };
 
 #endif // CVCAMERAREADER_H

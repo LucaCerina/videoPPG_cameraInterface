@@ -28,13 +28,15 @@ void MainWindow::on_playButton_clicked()
     {
         Reader->Play();
         ui->playButton->setText(tr("Stop"));
+        ui->statusLabel->setText("Preview");
         ui->recButton->setEnabled(true);
     }
     else
     {
         Reader->Stop();
-        tEnd = QDateTime::currentMSecsSinceEpoch();
         ui->playButton->setText(tr("Play"));
+        ui->playButton->setEnabled(false);
+        ui->statusLabel->setText("Idle");
         ui->recButton->setEnabled(false);
     }
 
@@ -67,12 +69,12 @@ void MainWindow::on_initButton_clicked()
     else
     {
         //create folder for video file
-        QString outPath = QDir::currentPath()+"/users/"+PtIstance.ptId+"/videos/";
+        QString outPath = QDir::currentPath()+"/users/"+PtIstance.ptId+"/records/";
         if(!QDir(outPath).exists())
             QDir().mkdir(outPath);
         QString outName = outPath+"video_"+PtIstance.ptId+"_"+
                 QDate::currentDate().toString("dd-MM-yyyy")+"_"
-                +QString::number(QTime::currentTime().hour())+"_"+QString::number(QTime::currentTime().minute())+".avi";
+                +QString::number(QTime::currentTime().hour())+"-"+QString::number(QTime::currentTime().minute())+".avi";
         if(QFile(outName).exists())
         {
             msgBox.setText("Attention! File already present,it will be overwritten");
@@ -150,25 +152,32 @@ void MainWindow::on_newRecButton_clicked()
     //check if a subject was selected
     if(PtIstance.ptId != "")
     {
+        ui->IDvalue->setText(PtIstance.ptId);
+        ui->nameValue->setText(PtIstance.ptName);
+        ui->surnameValue->setText(PtIstance.ptSurName);
+        ui->AFValue->setText(PtIstance.ptAFType);
         //enable camera init
         ui->initButton->setEnabled(true);
         //search if camera was already set in settings
         QString settingsFile = QApplication::applicationDirPath()+"/cameraSettings.ini";
         QSettings cameraSetting(settingsFile,QSettings::IniFormat);
+        ui->statusLabel->setText("Idle");
+    }
+    else
+    {
+        QMessageBox::warning(this,"Error","No patient selected for data recording");
+        this->show();
     }
 }
 
 void MainWindow::getExternalPtData(PatientDialog::PatientData extPtIstance)
 {
     PtIstance = extPtIstance;
-    ui->IDvalue->setText(PtIstance.ptId);
-    ui->nameValue->setText(PtIstance.ptName);
-    ui->surnameValue->setText(PtIstance.ptSurName);
-    ui->AFValue->setText(PtIstance.ptAFType);
 }
 
 void MainWindow::on_recButton_clicked()
 {
+    ui->statusLabel->setText("Recording");
     tStart = QDateTime::currentMSecsSinceEpoch();
     emit(recordStarted(true));
 }
@@ -178,6 +187,7 @@ void MainWindow::onRecordCompleted()
     tEnd = QDateTime::currentMSecsSinceEpoch();
     qDebug() << "Time passed " << (tEnd-tStart)/1000 << "s";
     qDebug() << "Measured framerate " << 1150 / ((tEnd-tStart)/1000) << "fps";
+    ui->statusLabel->setText("Record completed");
     ui->playButton->setText(tr("Play"));
     ui->playButton->setEnabled(false);
     ui->recButton->setEnabled(false);

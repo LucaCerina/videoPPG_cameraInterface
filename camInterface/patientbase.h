@@ -41,6 +41,8 @@ private slots:
 
     void on_sigButton_clicked();
 
+    void printOutput();
+
 private:
     Ui::patientBase *ui;
     QStringListModel *ptListModel = new QStringListModel(this);
@@ -48,8 +50,9 @@ private:
     PatientDialog::PatientData ptIstance;
     QElapsedTimer *timerExec = new QElapsedTimer();
     void populateExamList();
-    void getPtData();
+    bool getPtData();
     QString caller;
+    QProcess process1,process2;
 
 signals:
     void sendPtData(PatientDialog::PatientData);

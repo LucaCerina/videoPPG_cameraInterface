@@ -8,7 +8,7 @@ PatientDialog::PatientDialog(QWidget *parent, QString callerObject) :
 {
     ui->setupUi(this);
     //build window from User edit
-    if(!QString(parent->metaObject()->className()).compare("patientBase") && callerObject=="dataEdit")
+    if(QString(parent->metaObject()->className()).compare("patientBase")==0 && callerObject=="editData")
     {
         //QObject::connect(parent,SIGNAL(sendPtData(PatientData)),this,SLOT(getExternalPtData(PatientData)));
         ui->IdEdit->setEnabled(false);
@@ -16,8 +16,6 @@ PatientDialog::PatientDialog(QWidget *parent, QString callerObject) :
         ui->SurnameEdit->setEnabled(false);
         ui->birthdayEdit->setEnabled(false);
         ui->sexCBox->setEnabled(false);
-        ui->groupAFType->setEnabled(false);
-        ui->notesEdit->setEnabled(false);
     }
 }
 
@@ -43,7 +41,7 @@ void PatientDialog::on_buttonBox_accepted()
     }
     else
     {
-        QMessageBox::warning(this,"Error in data","Missing data, check again.");
+        QMessageBox::warning(this,"Error in data","Missing or invalid data, check again.");
         this->show();
     }
 
@@ -67,7 +65,7 @@ bool PatientDialog::checkPtData()
     else
         return false;
 
-    if(!ui->birthdayEdit->text().isEmpty())
+    if(!ui->birthdayEdit->text().isEmpty() && ui->birthdayEdit->text() != "INVALID DATE")
         ptIstance.ptBDay = QDate::fromString(ui->birthdayEdit->text(),"dd-MM-yyyy");
     else
         return false;
@@ -170,47 +168,46 @@ bool PatientDialog::savePtData()
     if(!QDir(ptPath).exists())
     {
         QDir().mkdir(ptPath);
-        QFile *outFile = new QFile(ptPath+"ptData.txt");
-        outFile->open(QIODevice::WriteOnly);
-        QTextStream out(outFile);
-        //write ptData
-        out << "Patient name\t" << ptIstance.ptName << endl;
-        out << "Patient surname\t" << ptIstance.ptSurName << endl;
-        out << "Patient birthday\t" << ptIstance.ptBDay.toString("dd-MM-yyyy") << endl;
-        out << "Patient biological sex\t" << ptIstance.ptSex << endl;
-        out << "Patient type\t" << ptIstance.ptAFType << endl;
-        out << "Rhythm treatment\t" << ptIstance.ptRhyTrea << endl;
-        out << "Rhythm start\t" << ptIstance.ptRhyTime.toString("dd-MM-yyyy") << endl;
-        out << "Rhythm dosage\t" << ptIstance.ptRhyDose << endl;
-        out << "Frequency treatment\t" << ptIstance.ptFreqTrea << endl;
-        out << "Frequency start\t" << ptIstance.ptFreqTime.toString("dd-MM-yyyy") << endl;
-        out << "Frequency dosage\t" << ptIstance.ptFreqDose << endl;
-        out << "Anticoagulant treatment\t" << ptIstance.ptAnticTrea << endl;
-        out << "Anticoagulant start\t" << ptIstance.ptAnticTime.toString("dd-MM-yyyy") << endl;
-        out << "Anticoagulant dosage\t" << ptIstance.ptAnticDose << endl;
-        out << "Introduction notes\t" << ptIstance.ptNotes << endl;
-        //close file
-        outFile->close();
+        QSettings outFile(ptPath+"ptData.dat",QSettings::IniFormat);
+        outFile.setValue("Patient name",ptIstance.ptName);
+        outFile.setValue("Patient surname",ptIstance.ptSurName);
+        outFile.setValue("Patient birthday",ptIstance.ptBDay.toString("dd-MM-yyyy"));
+        outFile.setValue("Patient biological sex",ptIstance.ptSex);
+        outFile.setValue("Last update",QDate::currentDate().toString("dd-MM-yyyy"));
+        outFile.beginGroup("Update " + QDate::currentDate().toString("dd-MM-yyyy"));
+        outFile.setValue("Patient AF type",ptIstance.ptAFType);
+        outFile.setValue("Rhythm treatment",ptIstance.ptRhyTrea);
+        outFile.setValue("Rhythm start",ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
+        outFile.setValue("Rhythm dosage",ptIstance.ptRhyDose);
+        outFile.setValue("Frequency treatment",ptIstance.ptFreqTrea);
+        outFile.setValue("Frequency start",ptIstance.ptFreqTime.toString("dd-MM-yyyy"));
+        outFile.setValue("Frequency dosage",ptIstance.ptFreqDose);
+        outFile.setValue("Anticoagulant treatment",ptIstance.ptAnticTrea);
+        outFile.setValue("Anticoagulant start",ptIstance.ptAnticTime.toString("dd-MM-yyyy"));
+        outFile.setValue("Anticoagulant dosage",ptIstance.ptAnticDose);
+        outFile.setValue("Notes",ptIstance.ptNotes);
+        outFile.endGroup();
+        outFile.sync();
         return true;
     }
     else
     {
-        QFile *outFile = new QFile(ptPath+"ptData.txt");
-        outFile->open(QIODevice::Append);
-        QTextStream out(outFile);
-        //write ptData
-        out << "Update date\t" << QDate::currentDate().toString("dd-MM-yyyy") << endl;
-        out << "Rhythm treatment\t" << ptIstance.ptRhyTrea << endl;
-        out << "Rhythm start\t" << ptIstance.ptRhyTime.toString("dd-MM-yyyy") << endl;
-        out << "Rhythm dosage\t" << ptIstance.ptRhyDose << endl;
-        out << "Frequency treatment\t" << ptIstance.ptFreqTrea << endl;
-        out << "Frequency start\t" << ptIstance.ptFreqTime.toString("dd-MM-yyyy") << endl;
-        out << "Frequency dosage\t" << ptIstance.ptFreqDose << endl;
-        out << "Anticoagulant treatment\t" << ptIstance.ptAnticTrea << endl;
-        out << "Anticoagulant start\t" << ptIstance.ptAnticTime.toString("dd-MM-yyyy") << endl;
-        out << "Anticoagulant dosage\t" << ptIstance.ptAnticDose << endl;
-        //close file
-        outFile->close();
+        QSettings outFile(ptPath+"ptData.dat",QSettings::IniFormat);
+        outFile.setValue("Last update",QDate::currentDate().toString("dd-MM-yyyy"));
+        outFile.beginGroup("Update " + QDate::currentDate().toString("dd-MM-yyyy"));
+        outFile.setValue("Patient AF type",ptIstance.ptAFType);
+        outFile.setValue("Rhythm treatment",ptIstance.ptRhyTrea);
+        outFile.setValue("Rhythm start",ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
+        outFile.setValue("Rhythm dosage",ptIstance.ptRhyDose);
+        outFile.setValue("Frequency treatment",ptIstance.ptFreqTrea);
+        outFile.setValue("Frequency start",ptIstance.ptFreqTime.toString("dd-MM-yyyy"));
+        outFile.setValue("Frequency dosage",ptIstance.ptFreqDose);
+        outFile.setValue("Anticoagulant treatment",ptIstance.ptAnticTrea);
+        outFile.setValue("Anticoagulant start",ptIstance.ptAnticTime.toString("dd-MM-yyyy"));
+        outFile.setValue("Anticoagulant dosage",ptIstance.ptAnticDose);
+        outFile.setValue("Notes",ptIstance.ptNotes);
+        outFile.endGroup();
+        outFile.sync();
         return true;
     }
 }
@@ -225,14 +222,14 @@ void PatientDialog::on_radioNormal_clicked()
 
 void PatientDialog::on_radioApc_clicked()
 {
-    ptIstance.ptAFType = "Other arrhytmias (see notes)";
+    ptIstance.ptAFType = "Other arrhytmias";
     ui->radioAf->setChecked(false);
     ui->radioNormal->setChecked(false);
 }
 
 void PatientDialog::on_radioAf_clicked()
 {
-    ptIstance.ptAFType = "Atrial fibrillation (see notes)";
+    ptIstance.ptAFType = "Atrial fibrillation";
     ui->radioNormal->setChecked(false);
     ui->radioApc->setChecked(false);
 }
@@ -245,7 +242,7 @@ void PatientDialog::getExternalPtData(PatientDialog::PatientData extPtIstance)
     for(int i=0;i < ui->sexCBox->count();i++)
     {
         ui->sexCBox->setCurrentIndex(i);
-        if(ui->sexCBox->currentText()[0] == ptIstance.ptSex)
+        if(ui->sexCBox->currentText().compare(ptIstance.ptSex)==0)
             break;
     }
     ui->NameEdit->setText(ptIstance.ptName);
@@ -254,7 +251,7 @@ void PatientDialog::getExternalPtData(PatientDialog::PatientData extPtIstance)
         //AF type
     if(!ptIstance.ptAFType.compare("Normal Sinus"))
         ui->radioNormal->setChecked(true);
-    else if (!ptIstance.ptAFType.compare("Atrial fibrillation (see notes)"))
+    else if (!ptIstance.ptAFType.compare("Atrial fibrillation"))
         ui->radioAf->setChecked(true);
     else
         ui->radioApc->setChecked(true);
@@ -284,4 +281,23 @@ void PatientDialog::getExternalPtData(PatientDialog::PatientData extPtIstance)
     }
 
 
+}
+
+void PatientDialog::on_IdEdit_editingFinished()
+{
+    QString ptPath = QDir::currentPath()+"/users/"+ui->IdEdit->text()+"/";
+    if(QDir(ptPath).exists() && ui->IdEdit->text() != "")
+    {
+        QMessageBox::warning(this,"Id not available","Id already used.Change the patient Id");
+        ui->IdEdit->setText("");
+        this->show();
+    }
+}
+
+void PatientDialog::on_birthdayEdit_editingFinished()
+{
+    if(!QDate::fromString(ui->birthdayEdit->text(),"dd-MM-yyyy").isValid())
+    {
+        ui->birthdayEdit->setText("INVALID DATE");
+    }
 }

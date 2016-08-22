@@ -28,7 +28,7 @@ public:
         QString ptName;
         QString ptSurName;
         QDate ptBDay;
-        QChar ptSex;
+        QString ptSex;
         QString ptAFType;
         QString ptRhyTrea;
         QString ptFreqTrea;
@@ -50,6 +50,10 @@ private slots:
     void on_radioApc_clicked();
 
     void on_radioAf_clicked();
+
+    void on_IdEdit_editingFinished();
+
+    void on_birthdayEdit_editingFinished();
 
 public slots:
     void getExternalPtData(PatientDialog::PatientData);

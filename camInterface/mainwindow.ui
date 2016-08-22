@@ -252,7 +252,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="fpsLabelName">
+   <widget class="QLabel" name="statusLabelName">
     <property name="geometry">
      <rect>
       <x>500</x>
@@ -262,15 +262,15 @@
      </rect>
     </property>
     <property name="text">
-     <string>Current Framerate</string>
+     <string>Current Status</string>
     </property>
    </widget>
-   <widget class="QLabel" name="fpsLabel">
+   <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
       <x>610</x>
       <y>140</y>
-      <width>50</width>
+      <width>100</width>
       <height>20</height>
      </rect>
     </property>

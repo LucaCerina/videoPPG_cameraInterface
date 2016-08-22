@@ -10,6 +10,13 @@ patientBase::patientBase(QWidget *parent,QString callerObject) :
     caller = callerObject;
     ui->setupUi(this);
     populatePtList();
+    if(caller == "newRec")
+    {
+        QWidget::setWindowTitle("Select user");
+        ui->ptDeleteButton->setEnabled(false);
+        ui->ptEditButton->setEnabled(false);
+        ui->tabWidget->setTabEnabled(1,false);
+    }
 }
 
 patientBase::~patientBase()
@@ -23,7 +30,6 @@ void patientBase::populatePtList()
      QString ptFolderPath;
      QString tempPtData;
      QStringList ptStringList;
-     QFile *ptFile;
      QDirIterator iterDir(ptPath,QDir::NoDotAndDotDot|QDir::Dirs, QDirIterator::NoIteratorFlags);
 
      while(iterDir.hasNext())
@@ -33,19 +39,10 @@ void patientBase::populatePtList()
 
          //open patient file in folder
          tempPtData = ptFolderPath.section("/",-1);
-         ptFile = new QFile(ptFolderPath+"/ptData.txt");
-         ptFile->open(QIODevice::ReadOnly);
-         QTextStream textstream(ptFile);
-
-         //read name and surname
-         for(int i=0;i<2;i++)
-         {
-             QString line = textstream.readLine();
-             tempPtData += " " + line.section("\t",1);
-         }
+         QSettings ptFile(ptFolderPath+"/ptData.dat",QSettings::IniFormat);
+         tempPtData += " " + ptFile.value("Patient name").toString() + " " + ptFile.value("Patient surname").toString();
          ptStringList.append(tempPtData);
 
-         ptFile->close();
      }
 
      //populate listview
@@ -63,14 +60,14 @@ void patientBase::populateExamList()
     QString ptID = ptFolder.section(" ",0,0);
     ptFolder = QDir::currentPath()+"/users/"+ptID+"/records/";
     //get subfolders
-    QDirIterator iterDir(ptFolder,QDir::NoDotAndDotDot|QDir::Dirs, QDirIterator::Subdirectories);
+    QDirIterator iterDir(ptFolder,QDir::NoDotAndDotDot|QDir::Files, QDirIterator::NoIteratorFlags);
 
     while(iterDir.hasNext())
     {
-
-        recFolderPath = iterDir.next().section("_",-1);
+        recFolderPath = iterDir.next().section(".avi",-2,-2).section("/",-1);
         qDebug() << recFolderPath;
-        recStringList.append(ptID + "_" + recFolderPath);
+        if(recFolderPath.compare("")!=0)
+            recStringList.append(recFolderPath);
     }
     //populate listview
     recStringList.sort();
@@ -78,165 +75,124 @@ void patientBase::populateExamList()
     ui->ptExamListView->setModel(recListModel);
 }
 
-void patientBase::getPtData()
+bool patientBase::getPtData()
 {
-    QFile *ptFile;
     QString line, lineType, lineValue;
     //user folder
     QString ptFolder = ptListModel->data(ui->ptListView->currentIndex(),Qt::DisplayRole).toString();
-    ptFolder = ptFolder.section(" ",0,0);
-    ptIstance.ptId = ptFolder;
-    ptFolder = QDir::currentPath()+"/users/"+ ptFolder+"/ptData.txt";
-    //open user file
-    ptFile = new QFile(ptFolder);
-    ptFile->open(QIODevice::ReadOnly);
-
-    line = ptFile->readLine();
-    while(!ptFile->atEnd())
+    if(ptFolder.compare("")!=0)
     {
-        lineType = line.section("\t",0,0);
-        lineValue = line.section("\t",1,1).trimmed();
-        //qDebug() << lineType << " " << qHash(lineType);
-        //qDebug() << lineValue;
+        ptFolder = ptFolder.section(" ",0,0);
+        ptIstance.ptId = ptFolder;
+        ptFolder = QDir::currentPath()+"/users/"+ ptFolder+"/ptData.dat";
+        //open user file
+        QSettings ptFile(ptFolder,QSettings::IniFormat);
 
-        //control
-        switch(qHash(lineType))
-        {
-        //name and surname
-        case 263592885:
-            ptIstance.ptName = lineValue;
-            break;
+        //get general data
+        ptIstance.ptName = ptFile.value("Patient Name").toString();
+        ptIstance.ptSurName = ptFile.value("Patient surname").toString();
+        ptIstance.ptSex = ptFile.value("Patient biological sex").toString();
+        ptIstance.ptBDay = QDate::fromString(ptFile.value("Patient birthday").toString(),"dd-MM-yyyy");
 
-        case 254849781:
-            ptIstance.ptSurName = lineValue;
-            break;
+        //switch top last update group
+        ptFile.beginGroup("Update " + ptFile.value("Last update").toString());
 
-        //calculate Age
-        case 252019977:
-            ptIstance.ptBDay = QDate::fromString(lineValue,"dd-MM-yyyy");
-            break;
-
-        //biological sex
-        case 243670376:
-            ptIstance.ptSex = lineValue[0];
-            break;
-
-        //AF type
-        case 263659493:
-            ptIstance.ptAFType = lineValue;
-            break;
-
-        //Treatments
-            //Rhythm
-        case 239308660:
-            ptIstance.ptRhyTrea = lineValue;
-            break;
-
-        case 73055572:
-            ptIstance.ptRhyTime = QDate::fromString(lineValue,"dd-MM-yyyy");
-            break;
-
-        case 79154005:
-            ptIstance.ptRhyDose = lineValue;
-            break;
-
-            //Frequency
-        case 82829876:
-            ptIstance.ptFreqTrea = lineValue;
-            break;
-
-        case 40638452:
-            ptIstance.ptFreqTime = QDate::fromString(lineValue,"dd-MM-yyyy");
-            break;
-
-        case 131948949:
-            ptIstance.ptFreqDose = lineValue;
-            break;
-
-            //Anticoagulants
-        case 3820564:
-            ptIstance.ptAnticTrea = lineValue;
-            break;
-
-        case 146342708:
-            ptIstance.ptAnticTime = QDate::fromString(lineValue,"dd-MM-yyyy");
-            break;
-
-        case 176958677:
-            ptIstance.ptAnticDose = lineValue;
-            break;
-        }
-        line = ptFile->readLine();
+        //get remaining data
+        ptIstance.ptAFType = ptFile.value("Patient AF type").toString();
+        ptIstance.ptRhyTrea = ptFile.value("Rhythm treatment").toString();
+        ptIstance.ptRhyDose = ptFile.value("Rhythm dosage").toString();
+        ptIstance.ptRhyTime = QDate::fromString(ptFile.value("Rhythm start").toString(),"dd-MM-yyyy");
+        ptIstance.ptFreqTrea = ptFile.value("Frequency treatment").toString();
+        ptIstance.ptFreqDose = ptFile.value("Frequency dosage").toString();
+        ptIstance.ptFreqTime = QDate::fromString(ptFile.value("Frequency start").toString(),"dd-MM-yyyy");
+        ptIstance.ptAnticTrea = ptFile.value("Anticoagulant treatment").toString();
+        ptIstance.ptAnticDose = ptFile.value("Anticoagulant dosage").toString();
+        ptIstance.ptAnticTime = QDate::fromString(ptFile.value("Anticoagulant start").toString(),"dd-MM-yyyy");
+        ptIstance.ptNotes = ptFile.value("Notes").toString();
+        return true;
     }
-
-    ptFile->close();
+    else if(ptFolder.compare("")==0 && caller!="newRec")
+    {
+        QMessageBox::warning(this,"Error","No patient selected or available for data access");
+        this->show();
+        return false;
+    }
 }
 
 void patientBase::on_ptAccessButton_clicked()
 {
     getPtData();
-    //Age
-    ui->labelValueAge->setText(QString::number(calculateAge(ptIstance.ptBDay,QDate::currentDate())));
-    //Sex
-    ui->labelValueSex->setText(ptIstance.ptSex);
-    //AF
-    ui->labelValueAFType->setText(ptIstance.ptAFType);
-    //Treatments
-    //Rhythm
-    if(!ptIstance.ptRhyTrea.compare("NA"))
+    if(ptIstance.ptId != "")
     {
-        ui->labelValueType_r->setText("No Treatment");
+        //Age
+        ui->labelValueAge->setText(QString::number(calculateAge(ptIstance.ptBDay,QDate::currentDate())));
+        //Sex
+        ui->labelValueSex->setText(ptIstance.ptSex);
+        //AF
+        ui->labelValueAFType->setText(ptIstance.ptAFType);
+        //Treatments
+        //Rhythm
+        if(!ptIstance.ptRhyTrea.compare("NA"))
+        {
+            ui->labelValueType_r->setText("No Treatment");
+            ui->labelValueFrom_r->setText(ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
+            ui->tabTreatment->setTabEnabled(0,false);
+        }
+        else
+        {
+            ui->tabTreatment->setTabEnabled(0,true);
+            ui->labelValueType_r->setText(ptIstance.ptRhyTrea);
+        }
         ui->labelValueFrom_r->setText(ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
-        ui->tabTreatment->setTabEnabled(0,false);
-    }
-    else
-    {
-        ui->tabTreatment->setTabEnabled(0,true);
-        ui->labelValueType_r->setText(ptIstance.ptRhyTrea);
-    }
-    ui->labelValueFrom_r->setText(ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
-    ui->labelValueDose_r->setText(ptIstance.ptRhyDose);
-    //Frequency
-    if(!ptIstance.ptFreqTrea.compare("NA"))
-    {
-        ui->labelValueType_f->setText("No Treatment");
-        ui->labelValueFrom_f->setText(ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
-        ui->tabTreatment->setTabEnabled(1,false);
-    }
-    else
-    {
-        ui->tabTreatment->setTabEnabled(1,true);
-        ui->labelValueType_f->setText(ptIstance.ptFreqTrea);
-    }
-    ui->labelValueFrom_f->setText(ptIstance.ptFreqTime.toString("dd-MM-yyyy"));
-    ui->labelValueDose_f->setText(ptIstance.ptFreqDose);
-    //Anticoagulant
-    if(!ptIstance.ptAnticTrea.compare("NA"))
-    {
-        ui->labelValueType_a->setText("No Treatment");
-        ui->labelValueFrom_a->setText(ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
-        ui->tabTreatment->setTabEnabled(2,false);
-    }
-    else
-    {
-        ui->tabTreatment->setTabEnabled(2,true);
-        ui->labelValueType_a->setText(ptIstance.ptAnticTrea);
-    }
-    ui->labelValueFrom_a->setText(ptIstance.ptAnticTime.toString("dd-MM-yyyy"));
-    ui->labelValueDose_a->setText(ptIstance.ptAnticDose);
+        ui->labelValueDose_r->setText(ptIstance.ptRhyDose);
+        //Frequency
+        if(!ptIstance.ptFreqTrea.compare("NA"))
+        {
+            ui->labelValueType_f->setText("No Treatment");
+            ui->labelValueFrom_f->setText(ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
+            ui->tabTreatment->setTabEnabled(1,false);
+        }
+        else
+        {
+            ui->tabTreatment->setTabEnabled(1,true);
+            ui->labelValueType_f->setText(ptIstance.ptFreqTrea);
+        }
+        ui->labelValueFrom_f->setText(ptIstance.ptFreqTime.toString("dd-MM-yyyy"));
+        ui->labelValueDose_f->setText(ptIstance.ptFreqDose);
+        //Anticoagulant
+        if(!ptIstance.ptAnticTrea.compare("NA"))
+        {
+            ui->labelValueType_a->setText("No Treatment");
+            ui->labelValueFrom_a->setText(ptIstance.ptRhyTime.toString("dd-MM-yyyy"));
+            ui->tabTreatment->setTabEnabled(2,false);
+        }
+        else
+        {
+            ui->tabTreatment->setTabEnabled(2,true);
+            ui->labelValueType_a->setText(ptIstance.ptAnticTrea);
+        }
+        ui->labelValueFrom_a->setText(ptIstance.ptAnticTime.toString("dd-MM-yyyy"));
+        ui->labelValueDose_a->setText(ptIstance.ptAnticDose);
 
-    //populate exams list
-    populateExamList();
-
+        //populate exams list
+        populateExamList();
+    }
+    else if(caller =="newRec")
+    {
+        QMessageBox::warning(this,"Error","No patient selected or available for data access");
+        this->show();
+    }
 }
 
 void patientBase::on_ptEditButton_clicked()
 {
-    getPtData();
-    PatientDialog *ptDialog = new PatientDialog(this,"editData");
-    QObject::connect(this,SIGNAL(sendPtData(PatientDialog::PatientData)),ptDialog,SLOT(getExternalPtData(PatientDialog::PatientData)));
-    emit sendPtData(ptIstance);
-    ptDialog->show();
+    if(getPtData())
+    {
+        PatientDialog *ptDialog = new PatientDialog(this,"editData");
+        QObject::connect(this,SIGNAL(sendPtData(PatientDialog::PatientData)),ptDialog,SLOT(getExternalPtData(PatientDialog::PatientData)));
+        emit sendPtData(ptIstance);
+        ptDialog->show();
+    }
 }
 
 void patientBase::on_ptNewButton_clicked()
@@ -248,27 +204,27 @@ void patientBase::on_ptNewButton_clicked()
 
 void patientBase::on_ptDeleteButton_clicked()
 {
-    getPtData();
-    QMessageBox::StandardButton msgBox;
-    msgBox = QMessageBox::question(this,"Delete","Are you sure? This operation cannot be undone!",QMessageBox::Yes|QMessageBox::No);
-
-    if(msgBox==QMessageBox::Yes)
+    if(getPtData())
     {
-        QDir dir;
-        QString currentFolder = QDir::currentPath()+"/users/"+ ptIstance.ptId;
-        QString deleteFolder = QDir::currentPath()+"/del_users/"+ ptIstance.ptId + "_deleted_"+ QDate::currentDate().toString("dd-MM-yyyy");
-        dir.rename(currentFolder,deleteFolder);
-        msgBox = QMessageBox::information(this,"Delete executed","Patient with ID " + ptIstance.ptId + " has been deleted");
+        QMessageBox::StandardButton msgBox;
+        msgBox = QMessageBox::question(this,"Delete","Are you sure? This operation cannot be undone!",QMessageBox::Yes|QMessageBox::No);
+
+        if(msgBox==QMessageBox::Yes)
+        {
+            QDir dir;
+            QString currentFolder = QDir::currentPath()+"/users/"+ ptIstance.ptId;
+            QString deleteFolder = QDir::currentPath()+"/del_users/"+ ptIstance.ptId + "_deleted_"+ QDate::currentDate().toString("dd-MM-yyyy");
+            dir.rename(currentFolder,deleteFolder);
+            msgBox = QMessageBox::information(this,"Delete executed","Patient with ID " + ptIstance.ptId + " has been deleted");
+        }
+        populatePtList();
     }
-    populatePtList();
 }
 
 void patientBase::on_buttonBox_accepted()
 {
-    if(caller=="newRec")
+    if(caller=="newRec" && getPtData())
     {
-        getPtData();
-        qDebug() << this->parent();
         QObject::connect(this,SIGNAL(sendPtData(PatientDialog::PatientData)),this->parent(),SLOT(getExternalPtData(PatientDialog::PatientData)));
         emit sendPtData(ptIstance);
     }
@@ -278,12 +234,13 @@ void patientBase::on_buttonBox_accepted()
 
 void patientBase::on_pushButton_clicked()
 {
+    bool processFlag = true;
     //get exam folder
     QString tempData = recListModel->data(ui->ptExamListView->currentIndex(),Qt::DisplayRole).toString();
-    QString examFile = QDir::currentPath()+"/users/"+tempData.section("_",0,0)+"/records/" + tempData +
-            "/examData.dat";
+    QString examFile = QDir::currentPath()+"/users/"+tempData.section("_",1,1)+"/records/" + tempData +
+            ".dat";
     qDebug() << examFile;
-    QSettings examData(examFile,QSettings::NativeFormat);
+    QSettings examData(examFile,QSettings::IniFormat);
     qDebug() << examData.value("processed").toString();
     //check if the video has been already processed
     if(examData.value("processed").toString() == "yes")
@@ -291,10 +248,22 @@ void patientBase::on_pushButton_clicked()
         QMessageBox::StandardButton msgBox;
         msgBox = QMessageBox::question(this,"Continue processing","The exam has been already processed. Do you want to continue?",
                                        QMessageBox::Yes | QMessageBox::No);
-        /***Video processing***/
-        examData.setValue("processed","yes");
-        examData.setValue("processDate",QDate::currentDate().toString("dd-MM-yyyy"));
+        if(msgBox == QMessageBox::No)
+            processFlag = false;
     }
+
+    //start video processing
+    if(processFlag)
+    {
+        process1.setStandardOutputProcess(&process2);
+        connect(&process2, SIGNAL(readyReadStandardOutput()),this,SLOT(printOutput()));
+        process1.start("ProgSender.exe");
+        process2.start("ProgReceiver.exe");
+        //process1.waitForFinished(-1);
+    }
+    /***Video processing***/
+    examData.setValue("processed","yes");
+    examData.setValue("processDate",QDate::currentDate().toString("dd-MM-yyyy"));
 }
 
 void patientBase::on_sigButton_clicked()
@@ -312,4 +281,10 @@ void patientBase::on_sigButton_clicked()
     elapsedTime = timerExec->elapsed();
     double elapsedSecs = double(elapsedTime)/1000.0;
     qDebug() << "Execution completed in " + QString::number(elapsedSecs) + " seconds";
+}
+
+void patientBase::printOutput()
+{
+    QByteArray strdata = process2.readAllStandardOutput();
+    qDebug() << strdata.data();
 }
