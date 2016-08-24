@@ -9,6 +9,7 @@
 #include <QSettings>
 #include<QFile>
 #include<QApplication>
+#include<QElapsedTimer>
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv2/imgproc/imgproc.hpp>
@@ -39,15 +40,21 @@ private:
     Mat RGBFrame;
     QImage img;
     CascadeClassifier faceCatch;
+    //timer variables
+    QElapsedTimer *recTimer = new QElapsedTimer();
+    qint64 tEnd;
+    std::vector<qint64> timeStamps;
     //methods
     bool initClassifier();
     void faceDetect(Mat &input);
+    void writeTimestamps();
     DShowLib::Grabber *m_pGrabber;
     DShowLib::FrameHandlerSink::tFHSPtr m_pSink;
     int nFrames,frameCounter;
     QString settingsFile;
     QString metaDataVideo;
     QString outVideoName;
+    QString timeDataName;
 
 signals:
     void processedImage(const QImage &image);

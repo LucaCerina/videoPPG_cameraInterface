@@ -38,6 +38,19 @@
      <height>311</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QGroupBox
+{
+border: 1px solid gray;
+}
+
+QGroupBox::title
+{
+subcontrol-origin: margin;
+subcontrol-position: top center;
+top: 3px;
+}</string>
+   </property>
    <property name="currentIndex">
     <number>1</number>
    </property>
@@ -586,7 +599,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>160</y>
        <width>250</width>
        <height>25</height>
       </rect>
@@ -599,7 +612,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>160</y>
+       <y>190</y>
        <width>250</width>
        <height>25</height>
       </rect>
@@ -608,17 +621,193 @@
       <string>Process signal</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QGroupBox" name="vidSetBox">
      <property name="geometry">
       <rect>
-       <x>320</x>
-       <y>50</y>
-       <width>201</width>
-       <height>16</height>
+       <x>280</x>
+       <y>10</y>
+       <width>280</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Video process settings</string>
+     </property>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>80</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Tracker reload</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>120</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Framerate subdivision</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinReload">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>20</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelReloadTime">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>20</y>
+        <width>60</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NA</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinTracker">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>50</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelTrackerFps">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>50</y>
+        <width>60</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NA</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="openVideoButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>250</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>Open video (external)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>120</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Current Status</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="executionLabel">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>120</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray
+</string>
+     </property>
+     <property name="text">
+      <string>NA</string>
+     </property>
+    </widget>
+    <widget class="QProgressBar" name="executionProgress">
+     <property name="geometry">
+      <rect>
+       <x>470</x>
+       <y>120</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>140</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Current message</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="outputLabel">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>160</y>
+       <width>280</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray
+</string>
+     </property>
+     <property name="text">
+      <string>NA</string>
      </property>
     </widget>
    </widget>

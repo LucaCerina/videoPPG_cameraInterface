@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>744</width>
-    <height>435</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -122,8 +122,24 @@
       <x>500</x>
       <y>200</y>
       <width>210</width>
-      <height>191</height>
+      <height>181</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QGroupBox
+{
+	border: 1px solid gray
+}
+
+QGroupBox::title
+{
+	subcontrol-origin: margin;
+	subcontrol-position: top center;
+	top: 5px
+
+}
+
+</string>
     </property>
     <property name="title">
      <string>Current patient</string>
@@ -136,6 +152,12 @@
        <width>70</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>Name</string>
@@ -150,6 +172,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>ID</string>
      </property>
@@ -163,6 +191,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>Surname</string>
      </property>
@@ -175,6 +209,12 @@
        <width>70</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>AF Type</string>

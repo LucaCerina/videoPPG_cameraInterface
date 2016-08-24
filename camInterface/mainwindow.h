@@ -51,7 +51,6 @@ signals:
 private:
     Ui::MainWindow *ui;
     cameraReader *Reader;
-    qint64 tStart,tEnd; //framerate temporary data
 
     //Window connections
     PatientDialog *ptDialog;
