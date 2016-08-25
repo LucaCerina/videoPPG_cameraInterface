@@ -262,18 +262,18 @@ void patientBase::on_pushButton_clicked()
 	}
 
 	//start video processing
-	if(processFlag)
+	if(processFlag && QFile("PhysioCAM.exe").exists())
 	{
 		//set progress bar
 		ui->executionProgress->setValue(0);
 		//DA CONTROLLARE
 		ui->executionProgress->setMaximum(examData.value("Framerate").toInt()*examData.value("Duration").toInt());
-		qDebug() << videoProcess->parent();
 		connect(videoProcess,SIGNAL(readyReadStandardOutput()),this,SLOT(printOutput()));
+		connect(videoProcess,SIGNAL(finished(int)),this,SLOT(on_videoProcessEnded()));
 		videoProcess->setProcessChannelMode(QProcess::MergedChannels);
 		videoProcess->setProgram("PhysioCAM.exe");
 		QStringList arguments;
-		arguments << "0" << "0" << "0" << videoNameFile << outSigFile << "0";
+		arguments << "0" << QString::number(reloadSteps) << QString::number(frameSub) << videoNameFile << outSigFile << "0";
 		videoProcess->setArguments(arguments);
 		videoProcess->start();
 		if(videoProcess->waitForStarted(-1))
@@ -281,21 +281,30 @@ void patientBase::on_pushButton_clicked()
 			ui->executionLabel->setText("Process started");
 		}
 	}
-	/***Video processing***/
+	//end processing
+	QSettings recordData(outSigFile+"_meta",QSettings::IniFormat);
+	recordData.setValue("reloadSteps",QString::number(reloadSteps));
+	recordData.setValue("frameSubs",QString::number(frameSub));
 	examData.setValue("processed","yes");
 	examData.setValue("processDate",QDate::currentDate().toString("dd-MM-yyyy"));
 }
 
 void patientBase::on_sigButton_clicked()
 {
+	//get exam folder
+	QString tempData = recListModel->data(ui->ptExamListView->currentIndex(),Qt::DisplayRole).toString();
+	QString examFile = QDir::currentPath()+"/users/"+tempData.section("_",1,1)+"/records/" + tempData +
+			".dat";
+	QSettings examData(examFile,QSettings::IniFormat);
+	QString sigFile = QDir::currentPath()+"/users/"+tempData.section("_",1,1)+"/signals/"+ tempData + "_rgb.csv";
 	qint64 elapsedTime;
 	QProcess proc;
 	proc.setProgram("C:/Users/Bio-tec/Anaconda3/python.exe"); //ORRORE DA SISTEMARE
 	qDebug() << "program " << proc.program();
 	QStringList arguments;
 	arguments << "C:\\Users\\Bio-tec\\Documents\\DEV\\QT\\build-camInterface-Desktop_Qt_5_7_0_MSVC2015_64bit-Debug\\signalProcess.py";
-	arguments << "subject1_rest_rgb.csv";
-	arguments << "subject1_record.mat";
+	arguments << sigFile;
+	arguments << examData.value("realFps").toString();
 	proc.setArguments(arguments);
 	proc.start();
 	if(proc.waitForStarted(-1))
@@ -324,6 +333,13 @@ void patientBase::printOutput()
 	else if(strdata.contains("Select"))
 	{
 		ui->outputLabel->setText(strdata.data());
+	}
+	else if(strdata.contains("Currfps") && ui->executionProgress->value()%128==0)
+	{
+		double seconds = (double)(ui->executionProgress->maximum()-ui->executionProgress->value());
+		seconds /= strdata.split(' ')[1].split('\r')[0].toDouble();
+		QString eta = QDateTime::fromTime_t(floor(seconds)).toUTC().toString("hh:mm:ss");
+		ui->etaLabel->setText(eta);
 	}
 	qDebug() << strdata.data();
 }
@@ -379,4 +395,9 @@ void patientBase::on_window_rejected()
 			else
 				this->show();
 		}
+}
+
+void patientBase::on_videoProcessEnded()
+{
+	ui->executionLabel->setText("Process completed");
 }

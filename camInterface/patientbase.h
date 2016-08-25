@@ -55,6 +55,8 @@ private slots:
 
 	void on_window_rejected();
 
+	void on_videoProcessEnded();
+
 private:
 	Ui::patientBase *ui;
 	QStringListModel *ptListModel = new QStringListModel(this);
@@ -71,8 +73,8 @@ private:
 
 	//video process settings
 	QProcess *videoProcess;
-	int reloadSteps;
-	int frameSub;
+	int reloadSteps = 1;
+	int frameSub = 1;
 
 signals:
 	void sendPtData(PatientDialog::PatientData);

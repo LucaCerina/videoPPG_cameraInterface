@@ -1,5 +1,6 @@
 #include<cvcamerareader.h>
 
+using namespace cv;
 using namespace DShowLib;
 
 cameraReader::cameraReader(QObject *parent)
@@ -22,7 +23,7 @@ cameraReader::~cameraReader()
 
 bool cameraReader::initClassifier()
 {
-	if(!faceCatch.load("C:\\Users\\Bio-tec\\Documents\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml"))
+	if(!faceCatch.load(QDir::currentPath().toStdString() +"/3rdparty/haarcascade_frontalface_alt.xml"))
 	{
 		QMessageBox msgBox;
 		msgBox.setText("Cannot load face detector.");

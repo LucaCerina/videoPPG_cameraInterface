@@ -19,7 +19,7 @@ LIBS += C:\Users\Bio-tec\Documents\opencv\build\x64\vc14\lib\opencv_world310d.li
 LIBS += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\x64\debug\TIS_UDSHL11d_x64.lib"
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+	mainwindow.cpp \
     cvcamerareader.cpp \
     patientdialog.cpp \
     patientbase.cpp \
@@ -38,5 +38,3 @@ FORMS    += mainwindow.ui \
     patientdialog.ui \
     patientbase.ui \
     camerasetupdialog.ui
-
-DISTFILES +=
