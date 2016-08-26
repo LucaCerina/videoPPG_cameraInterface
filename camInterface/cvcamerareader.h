@@ -63,7 +63,6 @@ public slots:
 
 protected:
 	void run();
-	void msleep(int ms);
 public:
 	//Constructor
 	cameraReader(QObject *parent=0);

@@ -37,15 +37,13 @@ private slots:
 
 	void populatePtList();
 
-	void on_pushButton_clicked();
-
 	void on_ptDeleteButton_clicked();
 
 	void on_sigButton_clicked();
 
 	void printOutput();
 
-	void on_videoSelectionChanged(QModelIndex current, QModelIndex previous);
+	void on_videoSelectionChanged(QModelIndex current);
 
 	void on_spinReload_valueChanged(int arg1);
 
@@ -56,6 +54,8 @@ private slots:
 	void on_window_rejected();
 
 	void on_videoProcessEnded();
+
+	void on_videoProcessButton_clicked();
 
 private:
 	Ui::patientBase *ui;

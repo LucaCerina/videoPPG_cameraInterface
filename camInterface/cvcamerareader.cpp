@@ -23,7 +23,8 @@ cameraReader::~cameraReader()
 
 bool cameraReader::initClassifier()
 {
-	if(!faceCatch.load(QDir::currentPath().toStdString() +"/3rdparty/haarcascade_frontalface_alt.xml"))
+	/* Load the face detector definition */
+	if(!faceCatch.load(QDir::currentPath().toStdString() + "/3rdparty/haarcascade_frontalface_alt.xml"))
 	{
 		QMessageBox msgBox;
 		msgBox.setText("Cannot load face detector.");
@@ -34,38 +35,51 @@ bool cameraReader::initClassifier()
 
 bool cameraReader::initCamera(int device,QString outName)
 {
+	/* Initialize camera and video ouput */
 	outVideoName = outName; //BRUTTO DA SISTEMARE
 	recording = false;
 	frameRate = 0;
-	//load camera
-	settingsFile = QApplication::applicationDirPath()+"/cameraSettings.ini";
-	QSettings cameraSetting(settingsFile,QSettings::IniFormat);
-	//save video data
-	metaDataVideo = outName.section(".",0,0)+".dat";
-	timeDataName = outName.section(".",0,0)+"_time.csv";
-	QSettings metaData(metaDataVideo,QSettings::IniFormat);
-	metaData.setValue("processed","no");
-	metaData.setValue("Record date",outName.section("video_",-1).section("_",1,1));
-	metaData.setValue("Record time",outName.section("video_",-1).section("_",2,2).section(".",0,0));
-	metaData.setValue("Format",cameraSetting.value("camFormat"));
-	metaData.setValue("Framerate",cameraSetting.value("camFPS"));
-	metaData.setValue("Duration",cameraSetting.value("videoDuration"));
 
+	// Load camera settings
+	settingsFile = QApplication::applicationDirPath() + "/cameraSettings.ini";
+	QSettings cameraSetting(settingsFile, QSettings::IniFormat);
+
+	// Save video metadata
+	metaDataVideo = outName.section(".",0,0) + ".dat";
+	timeDataName = outName.section(".",0,0) + "_time.csv";
+	QSettings metaData(metaDataVideo,QSettings::IniFormat);
+	metaData.setValue("processed", "no");
+	metaData.setValue("Record date", outName.section("video_",-1).section("_",1,1));
+	metaData.setValue("Record time", outName.section("video_",-1).section("_",2,2).section(".",0,0));
+	metaData.setValue("Format", cameraSetting.value("camFormat"));
+	metaData.setValue("Framerate", cameraSetting.value("camFPS"));
+	metaData.setValue("Duration", cameraSetting.value("videoDuration"));
+
+	// Open camera
 	if(QFile(settingsFile).exists())
 	{
-		//captureDevice.open(device);
 		m_pGrabber = new Grabber();
 		m_pGrabber->openDevByDisplayName(cameraSetting.value("camIndex").toString().toStdWString());
 		m_pGrabber->setVideoFormat(cameraSetting.value("camFormat").toString().toStdWString());
 		m_pGrabber->closeDev();
+
 		captureDevice.open(device);
 		frameRate = cameraSetting.value("camFPS").toDouble();
+		QString tempFormat = cameraSetting.value("camFormat").toString().section("(",1).section(")",0,0);
+		qDebug() << tempFormat;
+		Size videoSize = Size(tempFormat.section("x",0,0).toInt(), tempFormat.section("x",1,1).toInt());
 		if(captureDevice.set(CV_CAP_PROP_FPS,frameRate))
 			qDebug() << "setup ok " << captureDevice.get(CV_CAP_PROP_FPS);
-		if(!outputDevice.open(outName.toStdString(), CV_FOURCC('H','F','Y','U'), frameRate, Size(640, 480))) //DA SISTEMARE SIZE
-			qDebug() << "failed to open video";
-		//set number of frames
-		nFrames = cameraSetting.value("videoDuration").toInt()*(int)frameRate;
+		if(!outputDevice.open(outName.toStdString(), CV_FOURCC('H','F','Y','U'), frameRate, videoSize))
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Error: cannot open video file");
+			msgBox.exec();
+			return false;
+		}
+
+		// Set number of frames
+		nFrames = cameraSetting.value("videoDuration").toInt() * (int)frameRate;
 		return true;
 	}
 	else
@@ -79,6 +93,7 @@ bool cameraReader::initCamera(int device,QString outName)
 
 bool cameraReader::checkCamera(int device)
 {
+	/* Check if the selected device can be opened */
 	//load camera
 	captureDevice.open(device);
 
@@ -109,23 +124,27 @@ void cameraReader::Stop()
 
 void cameraReader::run()
 {
+	/* Open video and preview or record */
 	frameCounter = 0;
 	while(!stop && frameCounter<nFrames)
 	{
 		if(!captureDevice.read(frame))
 			stop = true;
+		// Preview
 		if(frame.channels()==3)
 		{
-			cv::cvtColor(frame,RGBFrame,COLOR_BGR2RGB);
+
+			cv::cvtColor(frame, RGBFrame, COLOR_BGR2RGB);
 			img = QImage((const unsigned char*)(RGBFrame.data),
-						 RGBFrame.cols,RGBFrame.rows,QImage::Format_RGB888);
+						 RGBFrame.cols, RGBFrame.rows, QImage::Format_RGB888);
 
 		}
 		else
 		{
 			img = QImage((const unsigned char*)(frame.data),
-						 frame.cols,frame.rows,QImage::Format_Indexed8);
+						 frame.cols,frame.rows, QImage::Format_Indexed8);
 		}
+		// Record
 		if(recording)
 		{
 			outputDevice << frame;
@@ -138,15 +157,14 @@ void cameraReader::run()
 		}
 		emit processedImage(img);
 	}
+	// Stop video
 	stop = true;
 	outputDevice.release();
 	if(frameCounter > 0)
 	{
-		double timeElapsed = (timeStamps.back()-timeStamps.front())/1000.0;
-		QSettings metaData(metaDataVideo,QSettings::IniFormat);
-		metaData.setValue("realFps",nFrames/timeElapsed);
-		qDebug() << "real elapsed time " << timeElapsed;
-		qDebug() << "real framerate " << nFrames/timeElapsed;
+		double timeElapsed = (timeStamps.back() - timeStamps.front()) / 1000.0;
+		QSettings metaData(metaDataVideo, QSettings::IniFormat);
+		metaData.setValue("realFps", nFrames/timeElapsed);
 		writeTimestamps();
 		emit(recordCompleted());
 	}
@@ -155,24 +173,18 @@ void cameraReader::run()
 		QFile::remove(metaDataVideo);
 		QFile::remove(outVideoName);
 	}
-	recording=false;
+	recording = false;
 }
 
 void cameraReader::faceDetect(Mat &input)
 {
+	/* Detect a face and send a signal to mainwindow */
 	std::vector<Rect> faces;
-	faceCatch.detectMultiScale(input,faces,1.2,3,CASCADE_FIND_BIGGEST_OBJECT|CASCADE_SCALE_IMAGE,Size(30,30));
+	faceCatch.detectMultiScale(input, faces, 1.2, 3, CASCADE_FIND_BIGGEST_OBJECT|CASCADE_SCALE_IMAGE, Size(30,30));
 	if(faces.size()==1)
 		emit detectedFace(true);
 	else
 		emit detectedFace(false);
-}
-
-void cameraReader::msleep(int ms)
-{
-	//struct timespec ts = {ms / 1000, (ms % 1000)*1000*1000};
-	//nanosleep(&ts, NULL);
-	Sleep(ms);
 }
 
 bool cameraReader::isStopped() const
@@ -195,14 +207,14 @@ void cameraReader::writeTimestamps()
 {
 	qDebug() << timeDataName;
 	QFile timeData(timeDataName);
-	if(timeData.open(QFile::WriteOnly|QFile::Text))
+	if(timeData.open(QFile::WriteOnly | QFile::Text))
 	{
 		QTextStream output(&timeData);
 		output << "TIME" << endl;
 		for(std::vector<qint64>::iterator it=timeStamps.begin();
-			it != timeStamps.end();++it)
+			it != timeStamps.end(); ++it)
 		{
-			output << (double)((*it-timeStamps.front())/1000.0) << endl;
+			output << (double)((*it-timeStamps.front()) / 1000.0) << endl;
 		}
 	}
 }

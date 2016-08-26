@@ -6,14 +6,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
 	Reader = new cameraReader();
-	QObject::connect(Reader,SIGNAL(processedImage(QImage)),
-					 this,SLOT(updateVideoUI(QImage)));
-	QObject::connect(Reader,SIGNAL(detectedFace(bool)),
-					 this,SLOT(updateDetectedFace(bool)));
-	QObject::connect(this,SIGNAL(recordStarted(bool)),
-					 Reader,SLOT(onRecordStarted(bool)));
-	QObject::connect(Reader,SIGNAL(recordCompleted()),
-					 this,SLOT(onRecordCompleted()));
+	QObject::connect(Reader, SIGNAL(processedImage(QImage)),
+					 this, SLOT(updateVideoUI(QImage)));
+	QObject::connect(Reader, SIGNAL(detectedFace(bool)),
+					 this, SLOT(updateDetectedFace(bool)));
+	QObject::connect(this, SIGNAL(recordStarted(bool)),
+					 Reader, SLOT(onRecordStarted(bool)));
+	QObject::connect(Reader, SIGNAL(recordCompleted()),
+					 this, SLOT(onRecordCompleted()));
 	ui->setupUi(this);
 }
 
@@ -48,13 +48,11 @@ void MainWindow::on_initButton_clicked()
 	bool cameraAvailable = false;
 	if(!Reader->isInitialized())
 	{
-		for(int i=0;i<1;i++) //DA SISTEMARE
+		// Try to open at least one camera
+		if(Reader->checkCamera(0))
 		{
-			if(Reader->checkCamera(i))
-			{
-				ui->cameraList->addItem(QString::number(i));
-				cameraAvailable = true;
-			}
+			ui->cameraList->addItem(QString::number(0));
+			cameraAvailable = true;
 		}
 		if(!cameraAvailable)
 		{
@@ -68,20 +66,25 @@ void MainWindow::on_initButton_clicked()
 	}
 	else
 	{
-		//create folder for video file
-		QString outPath = QDir::currentPath()+"/users/"+PtIstance.ptId+"/records/";
+		// Create folder for video file
+		QString outPath = QDir::currentPath() + "/users/" + PtIstance.ptId
+				+ "/records/";
 		if(!QDir(outPath).exists())
 			QDir().mkdir(outPath);
-		QString outName = outPath+"video_"+PtIstance.ptId+"_"+
-				QDate::currentDate().toString("dd-MM-yyyy")+"_"
-				+QString::number(QTime::currentTime().hour())+"-"+QString::number(QTime::currentTime().minute())+".avi";
+
+		//Create video filename
+		QString outName = outPath + "video_" + PtIstance.ptId + "_"
+				+ QDate::currentDate().toString("dd-MM-yyyy") + "_"
+				+ QString::number(QTime::currentTime().hour()) + "-"
+				+ QString::number(QTime::currentTime().minute()) + ".avi";
 		if(QFile(outName).exists())
 		{
 			msgBox.setText("Attention! File already present,it will be overwritten");
 			msgBox.exec();
 		}
-		//initialize camera
-		if(!Reader->initCamera(ui->cameraList->currentText().toInt(),outName))
+
+		//Initialize camera
+		if(!Reader->initCamera(ui->cameraList->currentText().toInt(), outName))
 		{
 			msgBox.setText("Cannot open camera! Check connection.");
 			msgBox.exec();
@@ -96,10 +99,11 @@ void MainWindow::on_initButton_clicked()
 
 void MainWindow::updateVideoUI(QImage img)
 {
+	/* Visualize preview in mainwindow */
 	if(!img.isNull())
 	{
 		ui->videoLabel->setPixmap(QPixmap::fromImage(img).scaled(ui->videoLabel->size(),
-																 Qt::KeepAspectRatio,Qt::FastTransformation));
+																 Qt::KeepAspectRatio, Qt::FastTransformation));
 	}
 }
 
@@ -109,13 +113,13 @@ void MainWindow::updateDetectedFace(bool value)
 	if(value)
 	{
 		ui->faceLabel->setText("Correct recording");
-		sPalette.setColor(QPalette::Window,Qt::green);
+		sPalette.setColor(QPalette::Window, Qt::green);
 		ui->faceLabel->setPalette(sPalette);
 	}
 	else
 	{
 		ui->faceLabel->setText("Face not in frame");
-		sPalette.setColor(QPalette::Window,Qt::red);
+		sPalette.setColor(QPalette::Window, Qt::red);
 		ui->faceLabel->setPalette(sPalette);
 	}
 }
@@ -129,7 +133,7 @@ void MainWindow::on_actionInsert_Data_triggered()
 
 void MainWindow::on_actionSearch_subjects_triggered()
 {
-	ptBase = new patientBase(this,"sbjSearch");
+	ptBase = new patientBase(this, "sbjSearch");
 	ptBase->show();
 }
 
@@ -146,7 +150,7 @@ void MainWindow::on_actionCamera_setup_triggered()
 
 void MainWindow::on_newRecButton_clicked()
 {
-	ptBase = new patientBase(this,"newRec");
+	ptBase = new patientBase(this, "newRec");
 	ptBase->exec();
 
 	//check if a subject was selected
@@ -159,16 +163,18 @@ void MainWindow::on_newRecButton_clicked()
 		//enable camera init
 		ui->initButton->setEnabled(true);
 		//search if camera was already set in settings
-		QString settingsFile = QApplication::applicationDirPath()+"/cameraSettings.ini";
-		QSettings cameraSetting(settingsFile,QSettings::IniFormat);
+		QString settingsFile = QApplication::applicationDirPath() + "/cameraSettings.ini";
+		QSettings cameraSetting(settingsFile, QSettings::IniFormat);
 		ui->statusLabel->setText("Idle");
 	}
 	else
 	{
-		QMessageBox::warning(this,"Error","No patient selected for data recording");
+		QMessageBox::warning(this, "Error", "No patient selected for data recording");
 		this->show();
 	}
 }
+
+//SLOTS
 
 void MainWindow::getExternalPtData(PatientDialog::PatientData extPtIstance)
 {
