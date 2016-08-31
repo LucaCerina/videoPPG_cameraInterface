@@ -14,48 +14,51 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+	explicit MainWindow(QWidget *parent = 0);
+	~MainWindow();
 
 private slots:
-    //display video frame in UI
-    void updateVideoUI(QImage img);
-    void updateDetectedFace(bool value);
-    void on_playButton_clicked();
+	//display video frame in UI
+	void updateVideoUI(QImage img, qint64 timeElapsed);
+	void updateDetectedFace(bool value);
+	void on_playButton_clicked();
 
-    void on_initButton_clicked();
+	void on_initButton_clicked();
 
-    void on_actionInsert_Data_triggered();
+	void on_actionInsert_Data_triggered();
 
-    void on_actionSearch_subjects_triggered();
+	void on_actionSearch_subjects_triggered();
 
-    void on_actionSearch_camera_triggered();
+	void on_actionSearch_camera_triggered();
 
-    void on_actionCamera_setup_triggered();
+	void on_actionCamera_setup_triggered();
 
-    void on_newRecButton_clicked();
+	void on_newRecButton_clicked();
 
-    void getExternalPtData(PatientDialog::PatientData extPtIstance);
+	void getExternalPtData(PatientDialog::PatientData extPtIstance);
 
-    void on_recButton_clicked();
+	void on_recButton_clicked();
 
 public slots:
-    void onRecordCompleted();
+	void onRecordCompleted();
 
 signals:
-    void recordStarted(bool value);
+	void recordStarted(bool value);
 
 private:
-    Ui::MainWindow *ui;
-    cameraReader *Reader;
+	Ui::MainWindow *ui;
+	cameraReader *Reader;
 
-    //Window connections
-    PatientDialog *ptDialog;
-    patientBase *ptBase;
-    PatientDialog::PatientData PtIstance;
+	// Window connections
+	PatientDialog *ptDialog;
+	patientBase *ptBase;
+	PatientDialog::PatientData PtIstance;
+
+	// Global variables
+	bool isRecording = false;
 };
 
 #endif // MAINWINDOW_H

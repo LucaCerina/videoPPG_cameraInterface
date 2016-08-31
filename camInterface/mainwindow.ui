@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>744</width>
-    <height>438</height>
+    <width>740</width>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,8 +39,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>110</y>
+      <x>510</x>
+      <y>90</y>
       <width>100</width>
       <height>25</height>
      </rect>
@@ -58,7 +58,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>500</x>
+      <x>510</x>
       <y>50</y>
       <width>120</width>
       <height>25</height>
@@ -71,7 +71,7 @@
    <widget class="QComboBox" name="cameraList">
     <property name="geometry">
      <rect>
-      <x>630</x>
+      <x>640</x>
       <y>50</y>
       <width>80</width>
       <height>25</height>
@@ -81,8 +81,8 @@
    <widget class="QLabel" name="faceLabel">
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>170</y>
+      <x>510</x>
+      <y>160</y>
       <width>210</width>
       <height>20</height>
      </rect>
@@ -106,7 +106,7 @@
    <widget class="QPushButton" name="newRecButton">
     <property name="geometry">
      <rect>
-      <x>500</x>
+      <x>510</x>
       <y>10</y>
       <width>120</width>
       <height>25</height>
@@ -119,8 +119,8 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>200</y>
+      <x>510</x>
+      <y>190</y>
       <width>210</width>
       <height>181</height>
      </rect>
@@ -279,8 +279,8 @@ QGroupBox::title
     </property>
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>110</y>
+      <x>620</x>
+      <y>90</y>
       <width>100</width>
       <height>25</height>
      </rect>
@@ -295,8 +295,8 @@ QGroupBox::title
    <widget class="QLabel" name="statusLabelName">
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>140</y>
+      <x>510</x>
+      <y>120</y>
       <width>120</width>
       <height>20</height>
      </rect>
@@ -308,8 +308,8 @@ QGroupBox::title
    <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>140</y>
+      <x>620</x>
+      <y>120</y>
       <width>100</width>
       <height>20</height>
      </rect>
@@ -318,13 +318,42 @@ QGroupBox::title
      <string>NA</string>
     </property>
    </widget>
+   <widget class="QLabel" name="recordTimeLabelName">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>140</y>
+      <width>120</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Record Time</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="recordTimeLabel">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>140</y>
+      <width>100</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>00:00:00</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>744</width>
+     <width>740</width>
      <height>21</height>
     </rect>
    </property>

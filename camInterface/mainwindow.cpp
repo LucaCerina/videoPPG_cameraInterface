@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
 	Reader = new cameraReader();
-	QObject::connect(Reader, SIGNAL(processedImage(QImage)),
-					 this, SLOT(updateVideoUI(QImage)));
+	QObject::connect(Reader, SIGNAL(processedImage(QImage, qint64)),
+					 this, SLOT(updateVideoUI(QImage, qint64)));
 	QObject::connect(Reader, SIGNAL(detectedFace(bool)),
 					 this, SLOT(updateDetectedFace(bool)));
 	QObject::connect(this, SIGNAL(recordStarted(bool)),
@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+	delete Reader;
 	delete ui;
 }
 
@@ -97,7 +98,7 @@ void MainWindow::on_initButton_clicked()
 	}
 }
 
-void MainWindow::updateVideoUI(QImage img)
+void MainWindow::updateVideoUI(QImage img, qint64 timeElapsed)
 {
 	/* Visualize preview in mainwindow */
 	if(!img.isNull())
@@ -105,6 +106,8 @@ void MainWindow::updateVideoUI(QImage img)
 		ui->videoLabel->setPixmap(QPixmap::fromImage(img).scaled(ui->videoLabel->size(),
 																 Qt::KeepAspectRatio, Qt::FastTransformation));
 	}
+	if(isRecording)
+		ui->recordTimeLabel->setText(QDateTime::fromTime_t(timeElapsed/1000).toUTC().toString("hh:mm:ss"));
 }
 
 void MainWindow::updateDetectedFace(bool value)
@@ -184,6 +187,7 @@ void MainWindow::getExternalPtData(PatientDialog::PatientData extPtIstance)
 void MainWindow::on_recButton_clicked()
 {
 	ui->statusLabel->setText("Recording");
+	isRecording = true;
 	emit(recordStarted(true));
 }
 

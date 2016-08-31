@@ -40,7 +40,7 @@ private:
 	cv::CascadeClassifier faceCatch;
 	//timer variables
 	QElapsedTimer *recTimer = new QElapsedTimer();
-	qint64 tEnd;
+	qint64 tEnd,tElapsed;
 	std::vector<qint64> timeStamps;
 	//methods
 	bool initClassifier();
@@ -55,7 +55,7 @@ private:
 	QString timeDataName;
 
 signals:
-	void processedImage(const QImage &image);
+	void processedImage(const QImage &image, qint64 timeElapsed);
 	void detectedFace(bool value);
 	void recordCompleted();
 public slots:

@@ -148,14 +148,15 @@ void cameraReader::run()
 		if(recording)
 		{
 			outputDevice << frame;
-			timeStamps.push_back(recTimer->elapsed());
+			tElapsed = recTimer->elapsed();
+			timeStamps.push_back(tElapsed);
 			++frameCounter;
 		}
 		else
 		{
 			faceDetect(frame);
 		}
-		emit processedImage(img);
+		emit processedImage(img,tElapsed);
 	}
 	// Stop video
 	stop = true;

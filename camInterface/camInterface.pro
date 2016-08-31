@@ -15,7 +15,8 @@ TEMPLATE = app
 #LIBS += -L /usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_videoio -lopencv_imgproc -lopencv_objdetect -lopencv_highgui
 INCLUDEPATH += C:\Users\Bio-tec\Documents\opencv\build\include
 INCLUDEPATH += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\include"
-LIBS += C:\Users\Bio-tec\Documents\opencv\build\x64\vc14\lib\opencv_world310d.lib
+Debug:LIBS += C:\Users\Bio-tec\Documents\opencv\build\x64\vc14\lib\opencv_world310d.lib
+Release:LIBS += C:\Users\Bio-tec\Documents\opencv\build\x64\vc14\lib\opencv_world310.lib
 Debug:LIBS += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\x64\debug\TIS_UDSHL11d_x64.lib"
 Release:LIBS += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\x64\release\TIS_UDSHL11_x64.lib"
 
