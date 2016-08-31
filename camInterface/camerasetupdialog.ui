@@ -209,7 +209,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Current Duration (sec.)</string>
+    <string>Current Duration</string>
    </property>
   </widget>
   <widget class="QLabel" name="timeLabel">

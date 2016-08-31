@@ -21,10 +21,11 @@ camerasetupdialog::camerasetupdialog(QWidget *parent) :
 		ui->formatLabel->setText(cameraSetting.value("camFormat").toString());
 		m_pGrabber->setVideoFormat(cameraSetting.value("camFormat").toString().toStdWString());
 		//camera Fps
-		ui->fpsLabel->setText(cameraSetting.value("camFps").toString());
+		ui->fpsLabel->setText(cameraSetting.value("camFps").toString() + " fps");
 		m_pGrabber->setFPS(cameraSetting.value("camFps").toDouble());
 		// Video duration
-		ui->timeLabel->setText(cameraSetting.value("videoDuration").toString());
+		QString tempTime = QDateTime::fromTime_t(cameraSetting.value("videoDuration").toInt()).toUTC().toString("hh:mm:ss");
+		ui->timeLabel->setText(tempTime + " [hh:mm:ss]");
 		cameraSetting.sync();
 		m_pGrabber->closeDev();
 	}
