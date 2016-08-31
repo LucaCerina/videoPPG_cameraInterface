@@ -168,7 +168,7 @@ bool PatientDialog::checkPtData()
 
 bool PatientDialog::savePtData()
 {
-	QString ptPath = QDir::currentPath() + "/users/" + ptIstance.ptId + "/";
+	QString ptPath = QApplication::applicationDirPath() + "/users/" + ptIstance.ptId + "/";
 	// Check if folder exists
 	if(!QDir(ptPath).exists())
 	{
@@ -295,7 +295,7 @@ void PatientDialog::getExternalPtData(PatientDialog::PatientData extPtIstance)
 
 void PatientDialog::on_IdEdit_editingFinished()
 {
-	QString ptPath = QDir::currentPath() + "/users/" + ui->IdEdit->text() + "/";
+	QString ptPath = QApplication::applicationDirPath() + "/users/" + ui->IdEdit->text() + "/";
 	if(QDir(ptPath).exists() && ui->IdEdit->text() != "")
 	{
 		QMessageBox::warning(this,"Id not available",

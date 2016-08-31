@@ -53,7 +53,7 @@ private slots:
 
 	void on_window_rejected();
 
-	void on_videoProcessEnded();
+	void on_videoProcessEnded(int exit, QProcess::ExitStatus status);
 
 	void on_videoProcessButton_clicked();
 
@@ -63,19 +63,21 @@ private:
 	QStringListModel *recListModel = new QStringListModel(this);
 	PatientDialog::PatientData ptIstance;
 	QElapsedTimer *timerExec = new QElapsedTimer();
-	void populateExamList();
-	bool getPtData();
 	QString caller;
 
-	//video meta data
+	// Video meta data
 	double videoFps;
 	int videoDuration;
 
-	//video process settings
+	// Video process settings
 	QProcess *videoProcess;
 	int reloadSteps = 1;
 	int frameSub = 1;
 
+	// Methods
+	void populateExamList();
+	bool getPtData();
+	QString getExamFolder(QChar mode);
 signals:
 	void sendPtData(PatientDialog::PatientData);
 

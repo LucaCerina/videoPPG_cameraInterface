@@ -33,7 +33,7 @@ patientBase::~patientBase()
 
 void patientBase::populatePtList()
 {
-	QString ptPath = QDir::currentPath() + "/users/";
+	QString ptPath = QApplication::applicationDirPath() + "/users/";
 	QString ptFolderPath, tempPtData;
 	QStringList ptStringList;
 	QDirIterator iterDir(ptPath,QDir::NoDotAndDotDot|QDir::Dirs, QDirIterator::NoIteratorFlags);
@@ -66,7 +66,7 @@ void patientBase::populateExamList()
 	// Get current patient folder
 	QString ptFolder = ptListModel->data(ui->ptListView->currentIndex(), Qt::DisplayRole).toString();
 	QString ptID = ptFolder.section(" ", 0, 0);
-	ptFolder = QDir::currentPath() + "/users/" + ptID + "/records/";
+	ptFolder = QApplication::applicationDirPath() + "/users/" + ptID + "/records/";
 
 	// Get subfolders
 	QDirIterator iterDir(ptFolder, QDir::NoDotAndDotDot | QDir::Files, QDirIterator::NoIteratorFlags);
@@ -95,7 +95,7 @@ bool patientBase::getPtData()
 	{
 		ptFolder = ptFolder.section(" ", 0, 0);
 		ptIstance.ptId = ptFolder;
-		ptFolder = QDir::currentPath() + "/users/" + ptFolder + "/ptData.dat";
+		ptFolder = QApplication::applicationDirPath() + "/users/" + ptFolder + "/ptData.dat";
 
 		// Open patient file
 		QSettings ptFile(ptFolder, QSettings::IniFormat);
@@ -232,8 +232,8 @@ void patientBase::on_ptDeleteButton_clicked()
 		if(msgBox==QMessageBox::Yes)
 		{
 			QDir dir;
-			QString currentFolder = QDir::currentPath() + "/users/" + ptIstance.ptId;
-			QString deleteFolder = QDir::currentPath() + "/del_users/" + ptIstance.ptId
+			QString currentFolder = QApplication::applicationDirPath() + "/users/" + ptIstance.ptId;
+			QString deleteFolder = QApplication::applicationDirPath() + "/del_users/" + ptIstance.ptId
 					+ "_deleted_" + QDate::currentDate().toString("dd-MM-yyyy");
 			dir.rename(currentFolder, deleteFolder);
 			msgBox = QMessageBox::information(this, "Delete executed",
@@ -258,23 +258,13 @@ void patientBase::on_videoProcessButton_clicked()
 {
 	bool processFlag = true;
 
-	// Get exam file
-	QString tempData = recListModel->data(ui->ptExamListView->currentIndex(), Qt::DisplayRole).toString();
-	qDebug() << tempData;
-	QString examFile = QDir::currentPath() + "/users/" + tempData.section("_",1,1)
-			+ "/records/" + tempData + ".dat";
-	QSettings examData(examFile,QSettings::IniFormat);
+	// Get exam settings
+	QSettings examData(getExamFolder('e'),QSettings::IniFormat);
 
 	// Video filename
-	QString videoFilename = QDir::currentPath() + "/users/" + tempData.section("_",1,1)
+	QString tempData = getExamFolder('t');
+	QString videoFilename = QApplication::applicationDirPath() + "/users/" + tempData.section("_",1,1)
 			+ "/records/" + tempData + ".avi";
-
-	// Signals folder
-	QString examDir = QDir::currentPath() + "/users/" + tempData.section("_",1,1)
-			+ "/signals/";
-	if(!QDir(examDir).exists())
-		QDir().mkdir(examDir);
-	QString outSigFilename = examDir + tempData;
 
 	// Check if the video has been already processed
 	if(examData.value("processed").toString() == "yes")
@@ -288,62 +278,74 @@ void patientBase::on_videoProcessButton_clicked()
 	}
 
 	// Start video processing
-	if(processFlag && QFile("PhysioCAM.exe").exists())
+	if(QFile(QApplication::applicationDirPath() + "/PhysioCAM.exe").exists())
 	{
-		// Set progress bar
-		ui->executionProgress->setValue(0);
-
-		// Set execution progress bar
-		ui->executionProgress->setMaximum(examData.value("Framerate").toInt() * examData.value("Duration").toInt());
-		connect(videoProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
-		connect(videoProcess, SIGNAL(finished(int)), this, SLOT(on_videoProcessEnded()));
-
-		// Set video process functions
-		videoProcess->setProcessChannelMode(QProcess::MergedChannels);
-		videoProcess->setProgram("PhysioCAM.exe");
-		QChar vidOutEnabled;
-		if(ui->vidOutCheck->isChecked())
-			vidOutEnabled = '1';
-		else
-			vidOutEnabled = '0';
-		QStringList arguments;
-		arguments << vidOutEnabled << QString::number(reloadSteps) << QString::number(frameSub) << videoFilename << outSigFilename << "0";
-		videoProcess->setArguments(arguments);
-
-		// Start video processing
-		videoProcess->start();
-		if(videoProcess->waitForStarted(-1))
+		if(processFlag)
 		{
-			ui->executionLabel->setText("Process started");
+			// Set progress bar
+			ui->executionProgress->setValue(0);
+
+			// Set execution progress bar
+			ui->executionProgress->setMaximum(examData.value("Framerate").toInt() * examData.value("Duration").toInt());
+			connect(videoProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
+			connect(videoProcess, SIGNAL(finished(int ,QProcess::ExitStatus)),
+					this, SLOT(on_videoProcessEnded(int, QProcess::ExitStatus)));
+
+			// Signals folder
+			QString examDir = QApplication::applicationDirPath() + "/users/" + tempData.section("_",1,1)
+					+ "/signals/";
+			if(!QDir(examDir).exists())
+				QDir().mkdir(examDir);
+			QString outSigFilename = examDir + tempData;
+
+			// Set video process functions
+			videoProcess->setProcessChannelMode(QProcess::MergedChannels);
+			videoProcess->setProgram(QApplication::applicationDirPath() + "/PhysioCAM.exe");
+			videoProcess->setWorkingDirectory(QApplication::applicationDirPath());
+			QChar vidOutEnabled;
+			if(ui->vidOutCheck->isChecked())
+				vidOutEnabled = '1';
+			else
+				vidOutEnabled = '0';
+			QStringList arguments;
+			arguments << vidOutEnabled << QString::number(reloadSteps) << QString::number(frameSub) << videoFilename << outSigFilename << "0";
+			videoProcess->setArguments(arguments);
+
+			// Disable process controls
+			ui->spinReload->setEnabled(false);
+			ui->spinTracker->setEnabled(false);
+			ui->vidOutCheck->setEnabled(false);
+
+			// Start video processing
+			videoProcess->start();
+			if(videoProcess->waitForStarted(-1))
+			{
+				ui->executionLabel->setText("Process started");
+			}
 		}
 	}
-
-	// End processing
-	QSettings recordData(outSigFilename + "_meta", QSettings::IniFormat);
-	recordData.setValue("reloadSteps", QString::number(reloadSteps));
-	recordData.setValue("frameSubs", QString::number(frameSub));
-	examData.setValue("processed", "yes");
-	examData.setValue("processDate", QDate::currentDate().toString("dd-MM-yyyy"));
+	else
+	{
+		QMessageBox::warning(this, "Error", "Videoprocessor PhysioCAM.exe not found. Cannot execute process");
+	}
 }
 
 void patientBase::on_sigButton_clicked()
 {
-	// Get exam folder
-	QString tempData = recListModel->data(ui->ptExamListView->currentIndex(), Qt::DisplayRole).toString();
-	QString examFile = QDir::currentPath() + "/users/" + tempData.section("_", 1, 1)
-			+ "/records/" + tempData + ".dat";
-	QSettings examData(examFile, QSettings::IniFormat);
+	// Get exam settings
+	QSettings examData(getExamFolder('e'), QSettings::IniFormat);
 
 	// Get signal file
-	QString sigFile = QDir::currentPath() + "/users/" + tempData.section("_",1,1)
+	QString tempData = getExamFolder('t');
+	QString sigFile = QApplication::applicationDirPath() + "/users/" + tempData.section("_",1,1)
 			+ "/signals/" + tempData + "_rgb.csv";
 
 	// Set process
 	QProcess signalProcess;
-	signalProcess.setProgram("C:/Users/Bio-tec/Anaconda3/python.exe"); //ORRORE DA SISTEMARE
+	signalProcess.setProgram("python.exe");
 	qDebug() << "program " << signalProcess.program();
 	QStringList arguments;
-	arguments << "C:\\Users\\Bio-tec\\Documents\\DEV\\QT\\build-camInterface-Desktop_Qt_5_7_0_MSVC2015_64bit-Debug\\signalProcess.py";
+	arguments << QApplication::applicationDirPath() + "/pyscripts/signalProcess.py";
 	arguments << sigFile;
 	arguments << examData.value("realFps").toString();
 	signalProcess.setArguments(arguments);
@@ -381,6 +383,8 @@ void patientBase::printOutput()
 		QString eta = QDateTime::fromTime_t(floor(seconds)).toUTC().toString("hh:mm:ss");
 		ui->etaLabel->setText(eta);
 	}
+	else if(!strdata.contains("***") && !strdata.contains("Currfps") )
+		ui->outputLabel->setText(strdata.data());
 }
 
 void patientBase::on_videoSelectionChanged(QModelIndex current)
@@ -388,7 +392,7 @@ void patientBase::on_videoSelectionChanged(QModelIndex current)
 	// Load video meta data
 	QString videoName = current.data().toString();
 	QString subject = videoName.section("_", 1, 1);
-	QSettings videoMetaData(QDir::currentPath() + "/users/" + subject
+	QSettings videoMetaData(QApplication::applicationDirPath() + "/users/" + subject
 							+ "/records/" + videoName + ".dat", QSettings::IniFormat);
 
 	// Get values
@@ -444,7 +448,51 @@ void patientBase::on_window_rejected()
 		}
 }
 
-void patientBase::on_videoProcessEnded()
+void patientBase::on_videoProcessEnded(int exit, QProcess::ExitStatus status)
 {
-	ui->executionLabel->setText("Process completed");
+	qDebug() << "exit " << exit;
+	qDebug() << "status " << status;
+	if(status == QProcess::NormalExit && exit == 0)
+	{
+		// Get exam settings
+		QSettings examData(getExamFolder('e'),QSettings::IniFormat);
+		// End processing
+		examData.setValue("processed", "yes");
+		examData.setValue("processDate", QDate::currentDate().toString("dd-MM-yyyy"));
+
+		// Signals folder
+		QString tempData = getExamFolder('t');
+		QString outSigFilename = QApplication::applicationDirPath() + "/users/" + tempData.section("_",1,1)
+				+ "/signals/" + tempData;
+
+		// Processing metadata
+		QSettings recordData(outSigFilename + "_meta", QSettings::IniFormat);
+		recordData.setValue("reloadSteps", QString::number(reloadSteps));
+		recordData.setValue("frameSubs", QString::number(frameSub));
+
+		ui->executionLabel->setText("Process completed");
+	}
+	else
+	{
+		ui->executionLabel->setText("Process error");
+	}
+
+	// Enable process controls
+	ui->spinReload->setEnabled(true);
+	ui->spinTracker->setEnabled(true);
+	ui->vidOutCheck->setEnabled(true);
+}
+
+QString patientBase::getExamFolder(QChar mode)
+{
+	// Get exam folder
+	QString tempData = recListModel->data(ui->ptExamListView->currentIndex(), Qt::DisplayRole).toString();
+	QString examFile = QApplication::applicationDirPath() + "/users/" + tempData.section("_", 1, 1)
+			+ "/records/" + tempData + ".dat";
+
+	// Control output
+	if(mode=='t')
+		return tempData;
+	else if(mode=='e')
+		return examFile;
 }

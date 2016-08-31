@@ -67,7 +67,7 @@ void MainWindow::on_initButton_clicked()
 	else
 	{
 		// Create folder for video file
-		QString outPath = QDir::currentPath() + "/users/" + PtIstance.ptId
+		QString outPath = QApplication::applicationDirPath() + "/users/" + PtIstance.ptId
 				+ "/records/";
 		if(!QDir(outPath).exists())
 			QDir().mkdir(outPath);

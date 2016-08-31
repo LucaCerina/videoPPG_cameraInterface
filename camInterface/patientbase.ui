@@ -825,6 +825,9 @@ top: 3px;
      <property name="text">
       <string>NA</string>
      </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QLabel" name="label_7">
      <property name="geometry">

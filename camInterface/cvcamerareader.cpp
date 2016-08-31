@@ -24,7 +24,7 @@ cameraReader::~cameraReader()
 bool cameraReader::initClassifier()
 {
 	/* Load the face detector definition */
-	if(!faceCatch.load(QDir::currentPath().toStdString() + "/3rdparty/haarcascade_frontalface_alt.xml"))
+	if(!faceCatch.load(QApplication::applicationDirPath().toStdString() + "/3rdparty/haarcascade_frontalface_alt.xml"))
 	{
 		QMessageBox msgBox;
 		msgBox.setText("Cannot load face detector.");
