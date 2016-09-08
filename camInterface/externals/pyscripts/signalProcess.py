@@ -17,14 +17,16 @@ with open(sys.argv[1], 'r') as csvfile:
 	x = list(reader)
 	result = np.array(x).astype('float')
 #Load sampling rate
-if(sys.argv[1].find("rest") != -1):
-	matRecord = loadmat(sys.argv[2], variable_names = "effectiveFrameRate_rest")
-	Fc = matRecord['effectiveFrameRate_rest']
+if(sys.argv[2].find(".mat") != -1):
+	if(sys.argv[1].find("rest") != -1):
+		matRecord = loadmat(sys.argv[2], variable_names = "effectiveFrameRate_rest")
+		Fc = matRecord['effectiveFrameRate_rest']
+	else:
+		matRecord = loadmat(sys.argv[2], variable_names = "effectiveFrameRate_stand")
+		Fc = matRecord['effectiveFrameRate_stand']
+	Fc = float(Fc[0])
 else:
-	matRecord = loadmat(sys.argv[2], variable_names = "effectiveFrameRate_stand")
-	Fc = matRecord['effectiveFrameRate_stand']
-Fc = float(Fc[0])
-#Fc = float(sys.argv[2])
+	Fc = float(sys.argv[2])
 
 
 # Detrending phase

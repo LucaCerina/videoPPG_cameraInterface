@@ -20,7 +20,7 @@ Release:LIBS += C:\Users\Bio-tec\Documents\opencv\build\x64\vc14\lib\opencv_worl
 Debug:LIBS += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\x64\debug\TIS_UDSHL11d_x64.lib"
 Release:LIBS += "C:\Users\Bio-tec\Documents\IC Imaging Control 3.4\classlib\x64\release\TIS_UDSHL11_x64.lib"
 
-Debug:3rdparty.path   = $${OUT_PWD}/3rdparty
+Debug:3rdparty.path   = $${OUT_PWD}/debug
 Release:3rdparty.path   = $${OUT_PWD}/release
 3rdparty.files  = $${PWD}/externals/*
 INSTALLS       += 3rdparty
@@ -41,7 +41,6 @@ HEADERS  += mainwindow.h \
     camerasetupdialog.h
 
 FORMS    += mainwindow.ui \
-    signalwidget.ui \
     patientdialog.ui \
     patientbase.ui \
     camerasetupdialog.ui

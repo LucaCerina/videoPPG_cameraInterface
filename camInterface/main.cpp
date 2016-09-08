@@ -3,6 +3,8 @@
 #include <QDir>
 #include <QDebug>
 #include <QLibrary>
+#include <QSettings>
+#include <QProcessEnvironment>
 
 int main(int argc, char *argv[])
 {
@@ -14,7 +16,6 @@ int main(int argc, char *argv[])
 		QDir().mkdir(QApplication::applicationDirPath() + "/users/");
 	if(!QDir(QApplication::applicationDirPath()+ "/del_users/").exists())
 		QDir().mkdir(QApplication::applicationDirPath() + "/del_users/");
-
 	//w.setAttribute(Qt::WA_DeleteOnClose,true);
 	w.show();
 

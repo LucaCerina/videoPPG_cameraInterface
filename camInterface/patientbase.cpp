@@ -286,7 +286,7 @@ void patientBase::on_videoProcessButton_clicked()
 			ui->executionProgress->setValue(0);
 
 			// Set execution progress bar
-			ui->executionProgress->setMaximum(examData.value("Framerate").toInt() * examData.value("Duration").toInt());
+			ui->executionProgress->setMaximum((int)floor(examData.value("Framerate").toDouble()) * examData.value("Duration").toInt());
 			connect(videoProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
 			connect(videoProcess, SIGNAL(finished(int ,QProcess::ExitStatus)),
 					this, SLOT(on_videoProcessEnded(int, QProcess::ExitStatus)));
@@ -355,10 +355,12 @@ void patientBase::on_sigButton_clicked()
 	if(signalProcess.waitForStarted(-1))
 	{
 		qDebug() << "Script started";
+		ui->executionLabel->setText("Analysis started");
 	}
 	signalProcess.waitForFinished(-1);
 
 	// Print output
+	ui->executionLabel->setText("Analysis completed");
 	QString pDebug = signalProcess.readAllStandardOutput();
 	qDebug() << pDebug;
 }
@@ -378,8 +380,8 @@ void patientBase::printOutput()
 	}
 	else if(strdata.contains("Currfps") && ui->executionProgress->value()%128==0)
 	{
-		double seconds = (double)(ui->executionProgress->maximum() - ui->executionProgress->value());
-		seconds /= strdata.split(' ')[1].split('\r')[0].toDouble();
+		int remFrames = ui->executionProgress->maximum() - ui->executionProgress->value();
+		double seconds = remFrames / strdata.split(' ')[1].split('\r')[0].toDouble();
 		QString eta = QDateTime::fromTime_t(floor(seconds)).toUTC().toString("hh:mm:ss");
 		ui->etaLabel->setText(eta);
 	}

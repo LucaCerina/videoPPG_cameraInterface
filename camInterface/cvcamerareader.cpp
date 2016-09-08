@@ -60,15 +60,14 @@ bool cameraReader::initCamera(int device,QString outName)
 	{
 		m_pGrabber = new Grabber();
 		m_pGrabber->openDevByDisplayName(cameraSetting.value("camIndex").toString().toStdWString());
-		m_pGrabber->setVideoFormat(cameraSetting.value("camFormat").toString().toStdWString());
-		m_pGrabber->closeDev();
+		qDebug() << m_pGrabber->setVideoFormat((cameraSetting.value("camFormat").toString() + " [Binning 2x]").toStdWString());
 
 		captureDevice.open(device);
 		frameRate = cameraSetting.value("camFPS").toDouble();
 		QString tempFormat = cameraSetting.value("camFormat").toString().section("(",1).section(")",0,0);
 		qDebug() << tempFormat;
 		Size videoSize = Size(tempFormat.section("x",0,0).toInt(), tempFormat.section("x",1,1).toInt());
-		if(captureDevice.set(CV_CAP_PROP_FPS,frameRate))
+		if(captureDevice.set(CV_CAP_PROP_FPS, frameRate))
 			qDebug() << "setup ok " << captureDevice.get(CV_CAP_PROP_FPS);
 		if(!outputDevice.open(outName.toStdString(), CV_FOURCC('H','F','Y','U'), frameRate, videoSize))
 		{
