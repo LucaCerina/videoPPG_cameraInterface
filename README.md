@@ -1,4 +1,4 @@
-# videoPPG-ZCA
+# cameraInterface
 QT graphical interface used to interact with the Imaging Source DFK23 camera and to record patient details for the AFCam project
 
 ## Dependencies
