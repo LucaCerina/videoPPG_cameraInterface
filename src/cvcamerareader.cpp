@@ -125,6 +125,7 @@ void cameraReader::run()
 {
 	/* Open video and preview or record */
 	frameCounter = 0;
+    timeStamps.clear();
 	while(!stop && frameCounter<nFrames)
 	{
 		if(!captureDevice.read(frame))
