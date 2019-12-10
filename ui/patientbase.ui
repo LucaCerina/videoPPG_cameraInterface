@@ -1,0 +1,901 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>patientBase</class>
+ <widget class="QDialog" name="patientBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>620</width>
+    <height>357</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Search database</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>320</y>
+     <width>171</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>620</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QGroupBox
+{
+border: 1px solid gray;
+}
+
+QGroupBox::title
+{
+subcontrol-origin: margin;
+subcontrol-position: top center;
+top: 3px;
+}</string>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="tabUser">
+    <attribute name="title">
+     <string>User Data</string>
+    </attribute>
+    <widget class="QLabel" name="labelSbjList">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Patients list</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="ptAccessButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>250</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Access patient data</string>
+     </property>
+    </widget>
+    <widget class="QListView" name="ptListView">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>250</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="ptEditButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>170</y>
+       <width>250</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Edit patient data</string>
+     </property>
+    </widget>
+    <widget class="QTabWidget" name="tabTreatment">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>114</y>
+       <width>321</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabRhy">
+      <attribute name="title">
+       <string>Rhythm</string>
+      </attribute>
+      <widget class="QLabel" name="labelFrom_r">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>60</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>From</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueDose_r">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>70</y>
+         <width>230</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border : 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>Drug dosage</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueType_r">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>300</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>Drug treatment</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueFrom_r">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>40</y>
+         <width>230</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border : 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>dd-mm-yyyy</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelDose_r">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>60</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Dosage</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tabFreq">
+      <attribute name="title">
+       <string>Frequency</string>
+      </attribute>
+      <widget class="QLabel" name="labelFrom_f">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>60</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>From</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueDose_f">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>70</y>
+         <width>230</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border : 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>Drug dosage</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueType_f">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>300</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>Drug treatment</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueFrom_f">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>40</y>
+         <width>230</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border : 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>dd-mm-yyyy</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelDose_f">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>60</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Dosage</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tabAntic">
+      <attribute name="title">
+       <string>Anticoagulant</string>
+      </attribute>
+      <widget class="QLabel" name="labelDose_a">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>60</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Dosage</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelFrom_a">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>60</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>From</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueType_a">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>300</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>Drug treatment</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueFrom_a">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>40</y>
+         <width>230</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border : 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>dd-mm-yyyy</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelValueDose_a">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>70</y>
+         <width>230</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border : 1px solid black</string>
+       </property>
+       <property name="text">
+        <string>Drug dosage</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>89</y>
+       <width>170</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Undergoing treatments</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelAFType">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>64</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>AF Type</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelValueAge">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>34</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black</string>
+     </property>
+     <property name="text">
+      <string>Age</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelValueSex">
+     <property name="geometry">
+      <rect>
+       <x>510</x>
+       <y>34</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black
+</string>
+     </property>
+     <property name="text">
+      <string>Sex</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>34</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Age</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelSex">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>34</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Sex</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelValueAFType">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>64</y>
+       <width>230</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black
+</string>
+     </property>
+     <property name="text">
+      <string>AF Type</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="ptNewButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>250</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>New patient</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="ptDeleteButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>230</y>
+       <width>250</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delete patient</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelSbjList_2">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>10</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Patient overview</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tabRecord">
+    <attribute name="title">
+     <string>Record Data</string>
+    </attribute>
+    <widget class="QLabel" name="labelRecList">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>140</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Patient's recording</string>
+     </property>
+    </widget>
+    <widget class="QListView" name="ptExamListView">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>250</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="videoProcessButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>180</y>
+       <width>250</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Process video</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="sigButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>215</y>
+       <width>250</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Process signal</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="vidSetBox">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>20</y>
+       <width>280</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Video process settings</string>
+     </property>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>80</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Tracker reload</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>120</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Framerate subdivision</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinReload">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>20</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelReloadTime">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>20</y>
+        <width>60</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NA</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinTracker">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>50</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelTrackerFps">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>50</y>
+        <width>60</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NA</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="vidOutCheck">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>120</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Video output</string>
+      </property>
+      <property name="tristate">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="openVideoButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>145</y>
+       <width>250</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Open video (external)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>130</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Current Status</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="executionLabel">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>130</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray
+</string>
+     </property>
+     <property name="text">
+      <string>NA</string>
+     </property>
+    </widget>
+    <widget class="QProgressBar" name="executionProgress">
+     <property name="geometry">
+      <rect>
+       <x>470</x>
+       <y>130</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>150</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Current message</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="outputLabel">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>170</y>
+       <width>280</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray
+</string>
+     </property>
+     <property name="text">
+      <string>NA</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>220</y>
+       <width>150</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Estimated Time of completion</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etaLabel">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>220</y>
+       <width>110</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid gray</string>
+     </property>
+     <property name="text">
+      <string>NA</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <zorder>tabWidget</zorder>
+  <zorder>buttonBox</zorder>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>patientBase</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>patientBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
