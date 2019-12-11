@@ -6,6 +6,7 @@ QT graphical interface used to interact with the Imaging Source DFK23 camera and
 - OpenCV (tested on v3.1) library
 - Imaging Source (IC) Imaging Control v3.4 library (it will also install a tool to setup the camera)
 The caminterface.pro file should be modified to target the correct path on the build pc
+Right now cameraInterface works only on Microsoft Windows due to Imaging Source libraries!
 
 ## How to use the system
 - Connect the camera to the PC via USB3.0 cable
