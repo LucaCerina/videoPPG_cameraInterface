@@ -1,5 +1,5 @@
-# cameraInterface
-QT graphical interface used to interact with the Imaging Source DFK23 camera and to record patient details for the AFCam project
+# videoPPG: cameraInterface
+QT graphical interface used to interact with the Imaging Source DFK23 camera and to record patient details for the AFCam project by `Corino et al., Computing in Cardiology (CinC), 2017`. From `Cerina et al., Influence of acquisition frame-rate and video compression techniques on pulse-rate variability estimation from vPPG signal, 2019`
 
 ## Dependencies
 - QT Creator (tested on v5.7) with compiler to build the project
@@ -14,7 +14,28 @@ Right now cameraInterface works only on Microsoft Windows due to Imaging Source 
 - TODO add the rest of the process
 
 ## Original contributors
-* Luca Cerina, ResMed, formerly Politecnico di Milano
+* Luca Cerina, formerly Politecnico di Milano
 * Professor Luca Mainardi, Politecnico di Milano
-* Valentina D.A. Corino PhD, Politecnico di Milano
 * Professor Riccardo Barbieri, Politecnico di Milano
+* Luca Iozzia PhD, TeiaCare, formerly Politecnico di Milano
+* Valentina D.A. Corino PhD, Politecnico di Milano
+
+## Project repositories
+* Conversion of video to raw RGB signal: [video2raw](https://github.com/LucaCerina/videoPPG_video2raw)
+* Processing of raw RGB signal to Heart Rate Variability [raw2hrv](https://github.com/LucaCerina/videoPPG_raw2hrv)
+
+## To cite this work
+If you use this project in a scientific paper, please cite:
+
+```
+@article{cerina2019influence,
+  title={Influence of acquisition frame-rate and video compression techniques on pulse-rate variability estimation from vPPG signal},
+  author={Cerina, Luca and Iozzia, Luca and Mainardi, Luca},
+  journal={Biomedical Engineering/Biomedizinische Technik},
+  volume={64},
+  number={1},
+  pages={53--65},
+  year={2019},
+  publisher={De Gruyter}
+}
+```
